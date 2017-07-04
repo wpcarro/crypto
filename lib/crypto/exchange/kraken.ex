@@ -30,9 +30,8 @@ defmodule Crypto.Exchange.Kraken do
   end
 
 
-  def transaction_fee(~M{%Order price, volume}) do
-    price * volume * 0.3
-  end
+  def transaction_fee,
+    do: 0.0026
 
 
   def execute_orders(_orders) do

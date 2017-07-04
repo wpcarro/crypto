@@ -4,8 +4,7 @@ defmodule Crypto.Exchange.GDAX do
 
   """
 
-  import ShorterMaps
-  alias Crypto.Core.{Order, OrderBook}
+  alias Crypto.Core.OrderBook
   alias Crypto.Exchange
   alias Crypto.Exchange.GDAX.HTTP
 
@@ -28,9 +27,8 @@ defmodule Crypto.Exchange.GDAX do
   end
 
 
-  def transaction_fee(~M{%Order price, volume}) do
-    price * volume * 0.3
-  end
+  def transaction_fee,
+    do: 0.003
 
 
   def execute_orders(_orders) do

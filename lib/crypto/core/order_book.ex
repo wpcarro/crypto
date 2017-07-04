@@ -63,12 +63,4 @@ defmodule Crypto.Core.OrderBook do
     end
   end
 
-  @spec parse_float(binary) :: float
-  defp parse_float(input) do
-    {result, ""} =
-      Float.parse(input)
-
-    result
-  end
-
 end

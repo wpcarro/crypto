@@ -5,9 +5,6 @@ defmodule Crypto.Exchange.GDAX.HTTP do
 
   """
 
-  alias __MODULE__
-  alias Crypto.Exchange.GDAX.OrderBook
-
 
 
   ################################################################################

@@ -1,11 +1,11 @@
-defmodule Crypto.HTTP.Kraken do
+defmodule Crypto.Exchange.Kraken.HTTP do
   @moduledoc """
   HTTP Driver for Kraken communication. This module bakes the base URL into the requests. It also
   signs the requests according to the Kraken specifications.
 
   """
 
-  alias Crypto.Kraken.OrderBook
+  alias Crypto.Exchange.Kraken.OrderBook
 
 
   ################################################################################
@@ -34,36 +34,13 @@ defmodule Crypto.HTTP.Kraken do
   Fetches data from Kraken's public API.
 
   """
-  @spec public_get(Path.t, keyword) :: HTTPoison.Response.t
-  def public_get(endpoint, opts \\ []) do
+  @spec public_get(Path.t, keyword, keyword) :: HTTPoison.Response.t
+  def public_get(endpoint, headers \\ [], opts \\ []) do
     url =
       Path.join([@base_url, "public", endpoint])
 
-    case HTTPoison.get!(url, opts) do
+    case HTTPoison.get!(url, headers, opts) do
       %HTTPoison.Response{body: body} -> Poison.decode!(body)
-    end
-  end
-
-
-  def get_order_book(product) do
-    url =
-      Path.join([@base_url, "public", "Depth"])
-
-    asset_pair =
-      to_asset_pair(product)
-
-    headers =
-      []
-
-    params =
-      [pair: asset_pair]
-
-    case HTTPoison.get!(url, headers, params: params) do
-      %HTTPoison.Response{body: body} ->
-        %{"result" => result} =
-          Poison.decode!(body)
-
-        result |> Map.get(asset_pair) |> OrderBook.from_raw
     end
   end
 
@@ -115,6 +92,6 @@ defmodule Crypto.HTTP.Kraken do
   end
 
   @spec to_asset_pair(product) :: binary
-  def to_asset_pair(:eth_usd), do: "XETHZUSD"
+  defp to_asset_pair(:eth_usd), do: "XETHZUSD"
 
 end

@@ -1,4 +1,4 @@
-defmodule Crypto.HTTP.GDAX do
+defmodule Crypto.Exchange.GDAX.HTTP do
   @moduledoc """
   HTTP Driver for GDAX communication. This module bakes the base URL into the requests. It also
   signs the requests according to the GDAX specifications.
@@ -6,14 +6,7 @@ defmodule Crypto.HTTP.GDAX do
   """
 
   alias __MODULE__
-  alias Crypto.GDAX.OrderBook
-
-
-  ################################################################################
-  # Types
-  ################################################################################
-
-  @typep product :: :eth_usd | :eth_btc | :btc_usd
+  alias Crypto.Exchange.GDAX.OrderBook
 
 
 
@@ -49,21 +42,6 @@ defmodule Crypto.HTTP.GDAX do
   end
 
 
-  @doc """
-  Returns a list of open orders for a product.
-
-  """
-  def get_order_book(product) do
-    endpoint =
-      "/products/#{product_id(product)}/book"
-
-    params =
-      [level: 2]
-
-    GDAX.get(endpoint, params: params) |> OrderBook.from_raw
-  end
-
-
 
   ################################################################################
   # Private Helpers
@@ -85,10 +63,5 @@ defmodule Crypto.HTTP.GDAX do
 
     headers |> Map.put("CB-ACCESS-SIGN", signature)
   end
-
-  @spec product_id(product) :: binary
-  defp product_id(:eth_usd), do: "ETH-USD"
-  defp product_id(:eth_btc), do: "ETH-BTC"
-  defp product_id(:btc_usd), do: "BTC-USD"
 
 end

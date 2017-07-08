@@ -31,9 +31,8 @@ defmodule Crypto.Exchange.GDAX do
     do: 0.003
 
 
-  def execute_orders(_orders) do
-    :ok
-  end
+  def execute_orders(_orders),
+    do: :ok
 
 
 

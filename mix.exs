@@ -16,8 +16,8 @@ defmodule Crypto.Mixfile do
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
     [extra_applications: [:logger],
-     applications: [:httpoison]
-    ]
+     applications: [:httpoison],
+     mod: {Crypto.Application, []}]
   end
 
   # Dependencies can be Hex packages:
@@ -35,7 +35,6 @@ defmodule Crypto.Mixfile do
       {:timex, "~> 3.1"},
       {:poison, "~> 3.1"},
       {:shorter_maps, "~> 2.1"},
-      {:websocket_client, "~> 1.2", manager: :rebar},
     ]
   end
 end

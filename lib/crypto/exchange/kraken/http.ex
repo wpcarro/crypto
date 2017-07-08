@@ -18,11 +18,12 @@ defmodule Crypto.Exchange.Kraken.HTTP do
 
 
   ################################################################################
-  # Private Helpers
+  # Public API
   ################################################################################
 
   @doc """
-  Fetches data from Kraken's public API.
+  Fetches data from Kraken's public API. Forwards `headers` and `opts` to the `HTTPoison.get!/3`
+  function.
 
   """
   @spec public_get(Path.t, keyword, keyword) :: HTTPoison.Response.t
@@ -30,9 +31,7 @@ defmodule Crypto.Exchange.Kraken.HTTP do
     url =
       Path.join([@base_url, "public", endpoint])
 
-    case HTTPoison.get!(url, headers, opts) do
-      %HTTPoison.Response{body: body} -> Poison.decode!(body)
-    end
+    HTTPoison.get!(url, headers, opts)
   end
 
 

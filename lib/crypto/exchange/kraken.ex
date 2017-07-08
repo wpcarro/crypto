@@ -4,8 +4,7 @@ defmodule Crypto.Exchange.Kraken do
 
   """
 
-  import ShorterMaps
-  alias Crypto.Core.{Order, OrderBook}
+  alias Crypto.Core.OrderBook
   alias Crypto.Exchange.Kraken.HTTP
 
   @behaviour Crypto.Exchange
@@ -24,7 +23,10 @@ defmodule Crypto.Exchange.Kraken do
       [pair: asset_pair]
 
     case HTTP.public_get("Depth", [], params: params) do
-      res when is_map(res) ->
+      %HTTPoison.Response{body: body} ->
+        res =
+          Poison.decode!(body)
+
         get_in(res, ["result", asset_pair]) |> order_book_from_raw
     end
   end
@@ -34,9 +36,8 @@ defmodule Crypto.Exchange.Kraken do
     do: 0.0026
 
 
-  def execute_orders(_orders) do
-    :ok
-  end
+  def execute_orders(_orders),
+    do: :ok
 
 
 
@@ -72,4 +73,5 @@ defmodule Crypto.Exchange.Kraken do
 
     result
   end
+
 end

@@ -16,7 +16,6 @@ defmodule Crypto.Core.Order do
     side: side,
     price: float,
     volume: float,
-    valid_until: DateTime.t,
     exchange: module,
   }
 
@@ -25,7 +24,6 @@ defmodule Crypto.Core.Order do
     side: nil,
     price: nil,
     volume: nil,
-    valid_until: nil,
     exchange: nil
   ]
 end

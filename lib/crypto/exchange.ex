@@ -12,7 +12,7 @@ defmodule Crypto.Exchange do
   # Types
   ################################################################################
 
-  @type asset_pair :: :eth_usd | :eth_btc | :btc_usd
+  @type asset_pair :: :eth_usd | :eth_btc | :btc_usd | :ltc_usd
 
 
   ################################################################################

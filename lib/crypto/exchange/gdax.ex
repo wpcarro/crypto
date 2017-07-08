@@ -28,7 +28,7 @@ defmodule Crypto.Exchange.GDAX do
   end
 
 
-  def transaction_fee,
+  def transaction_fee(_),
     do: 0.003
 
 

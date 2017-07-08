@@ -33,7 +33,7 @@ defmodule Crypto.Exchange.Kraken do
   end
 
 
-  def transaction_fee,
+  def transaction_fee(_),
     do: 0.0026
 
 
@@ -64,15 +64,6 @@ defmodule Crypto.Exchange.Kraken do
     end
 
     struct(OrderBook, asks: Enum.map(asks, decode_entry), bids: Enum.map(bids, decode_entry))
-  end
-
-
-  @spec parse_float(binary) :: float
-  defp parse_float(input) do
-    {result, ""} =
-      Float.parse(input)
-
-    result
   end
 
 end

@@ -8,7 +8,7 @@ defmodule Crypto.Exchange.Gemini.HTTP do
   Public API: Gemini limits requests to 120 per minute. Do not exceed 1 request per second.
   Private API: Gemini limits requests to 600 per minute. Do not exceed 5 request per second.
 
-  429s are sent to signal a backoff.
+  429s are sent to signal the client to backoff.
 
   """
 

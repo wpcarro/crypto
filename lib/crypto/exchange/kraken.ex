@@ -4,6 +4,7 @@ defmodule Crypto.Exchange.Kraken do
 
   """
 
+  alias Crypto.Utils
   alias Crypto.Core.OrderBook
   alias Crypto.Exchange.Kraken.HTTP
 
@@ -56,8 +57,8 @@ defmodule Crypto.Exchange.Kraken do
 
     decode_entry = fn
       [price, size, timestamp] ->
-        %{price: parse_float(price),
-          volume: parse_float(size),
+        %{price: Utils.parse_float(price),
+          volume: Utils.parse_float(size),
           extra: %{timestamp: Timex.from_unix(timestamp)},
          }
     end

@@ -4,6 +4,7 @@ defmodule Crypto.Exchange.Gemini do
 
   """
 
+  alias Crypto.Utils
   alias Crypto.Core.OrderBook
   alias Crypto.Exchange.Gemini.HTTP
 
@@ -51,31 +52,13 @@ defmodule Crypto.Exchange.Gemini do
 
     decode_entry = fn
       %{"price" => price, "amount" => amount, "timestamp" => timestamp} ->
-        %{price: parse_float(price),
-          volume: parse_float(amount),
-          extra: %{timestamp: parse_int(timestamp) |> Timex.from_unix},
+        %{price: Utils.parse_float(price),
+          volume: Utils.parse_float(amount),
+          extra: %{timestamp: Utils.parse_int(timestamp) |> Timex.from_unix},
          }
     end
 
     struct(OrderBook, asks: Enum.map(asks, decode_entry), bids: Enum.map(bids, decode_entry))
-  end
-
-
-  @spec parse_int(binary) :: integer
-  defp parse_int(input) do
-    {result, ""} =
-      Integer.parse(input)
-
-    result
-  end
-
-
-  @spec parse_float(binary) :: float
-  defp parse_float(input) do
-    {result, ""} =
-      Float.parse(input)
-
-    result
   end
 
 end

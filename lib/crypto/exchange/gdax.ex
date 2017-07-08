@@ -4,6 +4,7 @@ defmodule Crypto.Exchange.GDAX do
 
   """
 
+  alias Crypto.Utils
   alias Crypto.Core.OrderBook
   alias Crypto.Exchange
   alias Crypto.Exchange.GDAX.HTTP
@@ -53,22 +54,13 @@ defmodule Crypto.Exchange.GDAX do
 
     decode_entry = fn
       [price, size, order_count] ->
-        %{price: parse_float(price),
-          volume: parse_float(size),
+        %{price: Utils.parse_float(price),
+          volume: Utils.parse_float(size),
           extra: %{order_count: order_count},
          }
     end
 
     struct(OrderBook, asks: Enum.map(asks, decode_entry), bids: Enum.map(bids, decode_entry))
-  end
-
-
-  @spec parse_float(binary) :: float
-  defp parse_float(input) do
-    {result, ""} =
-      Float.parse(input)
-
-    result
   end
 
 end

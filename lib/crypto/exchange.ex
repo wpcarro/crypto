@@ -31,4 +31,6 @@ defmodule Crypto.Exchange do
 
   @callback supported_assets :: MapSet.t(asset)
 
+  @callback supported_sides :: MapSet.t(Order.side)
+
 end

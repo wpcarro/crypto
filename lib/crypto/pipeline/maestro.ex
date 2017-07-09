@@ -19,11 +19,7 @@ defmodule Crypto.Pipeline.Maestro do
   ################################################################################
 
   @typep avg :: %{total_time: float, trip_count: non_neg_integer}
-
-  @typep state :: %{
-    total_profit: float,
-    last_seen_profit: float,
-  }
+  @typep state :: %{}
 
 
 
@@ -33,6 +29,10 @@ defmodule Crypto.Pipeline.Maestro do
 
   @currency_pair :eth_usd
   @supported_exchanges [GDAX, Kraken, Gemini]
+  @pairable_exchanges [
+    {GDAX, Kraken}, {Kraken, GDAX},
+    {Gemini, GDAX}, {Gemini, Kraken},
+  ] # todo impl pairing function
 
 
 
@@ -55,19 +55,22 @@ defmodule Crypto.Pipeline.Maestro do
       Timex.now |> Timex.to_unix
 
     task =
-      Task.async(fn ->
-        Maestro.run
-      end)
+      Task.async(fn -> Maestro.run end)
 
     case Task.yield(task, @cycle_interval) || Task.shutdown(task) do
-      {:ok, {buy, sell, profit, total_profit}} ->
-        spread =
-          sell.price - buy.price
+      {:ok, result} ->
+        case result do
+          {buy, sell, profit} ->
+            spread =
+              sell.price - buy.price
 
-        IO.puts("#{stringify_exchange(buy.exchange)} $#{buy.price} X #{buy.volume} -> #{stringify_exchange(sell.exchange)} $#{sell.price} X #{sell.volume}")
-        IO.puts("\tSpread: $#{spread}")
-        IO.puts("\tProfit: $#{profit}")
-        IO.puts("\tTotal Profit: $#{total_profit}\n")
+            IO.puts("#{cycles_remaining}. #{stringify_exchange(buy.exchange)} $#{buy.price} X #{buy.volume} -> #{stringify_exchange(sell.exchange)} $#{sell.price} X #{sell.volume}")
+            IO.puts("\tSpread: $#{spread}")
+            IO.puts("\tProfit: $#{profit}\n")
+
+          nil ->
+            IO.puts("#{cycles_remaining} Holding...\n")
+        end
 
       nil ->
         IO.inspect("Failed to get a result this cycle.")
@@ -97,67 +100,81 @@ defmodule Crypto.Pipeline.Maestro do
 
   def init(:ok) do
     state =
-      %{total_profit: 0.0,
-        last_seen_profit: nil,
-       }
+      %{}
 
     {:ok, state}
   end
 
 
   def handle_call({:run}, _fr, state) do
-    orders =
+    exchange_to_orderbook =
       @supported_exchanges
       |> Enum.map(&fetch_for_exchange/1)
       |> Task.yield_many(1_000)
-      |> Enum.map(fn {task, {:ok, res}} ->
+      |> Enum.map(fn {task, res} ->
         case res do
-          {:ok, summary} ->
+          {:ok, {:ok, summary}} ->
             summary
 
-          {:error, :fetch_fail} ->
+          {:ok, {:error, :fetch_fail}} ->
             :fail
 
           nil ->
+            # Task did not complete within time acceptable interval. Fail
             Task.shutdown(task, :brutal_kill)
+            :fail
+
+          {:exit, reason} ->
+            # Task died. Fail
+            IO.inspect("Task failed with reason: #{inspect(reason)}")
+            :fail
         end
       end)
       |> Enum.reject(&match?(:fail, &1))
+      |> Enum.into(%{})
 
-    %{exchange: buy_exchange, ask: %{price: buy_price, volume: buy_volume}} =
-      orders |> Enum.min_by(fn %{ask: ~M{price}} -> price end)
+    pairable_exchanges =
+      @pairable_exchanges
+      |> Enum.filter(fn {buy_exchange, sell_exchange} ->
+        Map.has_key?(exchange_to_orderbook, buy_exchange) and
+        Map.has_key?(exchange_to_orderbook, sell_exchange)
+      end)
 
-    %{exchange: sell_exchange, ask: %{price: sell_price, volume: sell_volume}} =
-      orders |> Enum.max_by(fn %{bid: ~M{price}} -> price end)
-
-    ask =
-      %{price: buy_price, volume: buy_volume, exchange: buy_exchange}
-
-    bid =
-      %{price: sell_price, volume: sell_volume, exchange: sell_exchange}
-
-    {buy, sell} =
-      Quant.orders_for(ask: ask, bid: bid)
-
-    profit =
-      Quant.arbitrage_profit(buy: buy, sell: sell)
-
-    updated_state =
-      case state.last_seen_profit == profit do
-        true ->
-          %{state | last_seen_profit: profit}
-
-        false ->
-          %{state |
-            total_profit: state.total_profit + profit,
-            last_seen_profit: profit,
-           }
-      end
+    case pairable_exchanges do
+      [] -> IO.inspect("No pairable exchanges")
+      _  -> IO.inspect(pairable_exchanges)
+    end
 
     result =
-      {buy, sell, profit, updated_state.total_profit}
+      pairable_exchanges
+      |> Stream.map(fn {buy_exchange, sell_exchange} ->
+        ~M{ask} =
+          Map.fetch!(exchange_to_orderbook, buy_exchange)
 
-    {:reply, result, updated_state}
+        ~M{bid} =
+          Map.fetch!(exchange_to_orderbook, sell_exchange)
+
+        ask =
+          %{price: ask.price, volume: ask.volume, exchange: buy_exchange}
+
+        bid =
+          %{price: bid.price, volume: bid.volume, exchange: sell_exchange}
+
+        {ask, bid}
+      end)
+      |> Stream.map(fn {ask, bid} ->
+        {buy_order, sell_order} =
+          Quant.orders_for(ask: ask, bid: bid)
+
+        profit =
+          Quant.arbitrage_profit(buy: buy_order, sell: sell_order)
+
+        {buy_order, sell_order, profit}
+      end)
+      # |> Stream.reject(fn {_buy_order, _sell_order, profit} -> profit < 0.0 end)
+      |> Enum.max_by(fn {_buy_order, _sell_order, profit} -> profit end, fn -> nil end)
+
+    {:reply, result, state}
   end
 
 
@@ -180,14 +197,16 @@ defmodule Crypto.Pipeline.Maestro do
 
       case result do
         ~M{bids, asks} ->
-          summary =
-            %{exchange: exchange,
-              bid: bids |> hd,
+          key =
+            exchange
+
+          value =
+            %{bid: bids |> hd,
               ask: asks |> hd,
               rtt: t1 - t0,
             }
 
-          {:ok, summary}
+          {:ok, {key, value}}
 
         _ -> {:error, :fetch_fail}
       end

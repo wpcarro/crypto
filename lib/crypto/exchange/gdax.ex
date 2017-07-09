@@ -2,6 +2,9 @@ defmodule Crypto.Exchange.GDAX do
   @moduledoc """
   Behaviour module implementing the `Crypto.Exchange` callbacks for GDAX.
 
+  GDAX supports margin trading through its API meaning our algorithm can take both buy and sell
+  sides of arbitrage opportunities.
+
   """
 
   alias Crypto.Utils
@@ -48,6 +51,10 @@ defmodule Crypto.Exchange.GDAX do
 
   def supported_assets,
     do: MapSet.new([:eth, :btc, :ltc, :usd, :eur, :gbp])
+
+
+  def supported_sides,
+    do: MapSet.new([:buy, :sell])
 
 
 

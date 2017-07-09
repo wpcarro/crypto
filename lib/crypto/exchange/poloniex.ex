@@ -32,6 +32,16 @@ defmodule Crypto.Exchange.Poloniex do
   end
 
 
+  def supported_assets do
+    raise("Not implemented!")
+  end
+
+
+  def supported_sides do
+    raise("Not implemented!")
+  end
+
+
 
   ################################################################################
   # Web-Socket Callbacks

@@ -2,6 +2,9 @@ defmodule Crypto.Exchange.Gemini do
   @moduledoc """
   Behaviour module implementing the `Crypto.Exchange` callbacks for Kraken.
 
+  At this time, Gemini has dropped support for its margin trading through its API. This means that
+  our algorithm can only buy from Gemini.
+
   """
 
   alias Crypto.Utils
@@ -37,6 +40,14 @@ defmodule Crypto.Exchange.Gemini do
 
   def execute_orders(_order),
     do: :ok
+
+
+  def supported_assets,
+    do: MapSet.new([:eth, :btc, :usd])
+
+
+  def supported_sides,
+    do: MapSet.new([:buy])
 
 
 

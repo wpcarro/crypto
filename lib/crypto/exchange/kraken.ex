@@ -45,6 +45,14 @@ defmodule Crypto.Exchange.Kraken do
     do: :ok
 
 
+  def supported_assets,
+    do: raise("Not implemented")
+
+
+  def supported_sides,
+    do: MapSet.new([:buy, :sell])
+
+
 
   ################################################################################
   # Private Helpers

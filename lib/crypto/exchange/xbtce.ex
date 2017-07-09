@@ -30,6 +30,14 @@ defmodule Crypto.Exchange.XBTCE do
     do: raise("Not implemented.")
 
 
+  def supported_assets,
+    do: raise("Not implemented.")
+
+
+  def supported_sides,
+    do: raise("Not implemented.")
+
+
 
   ################################################################################
   # Private Helpers

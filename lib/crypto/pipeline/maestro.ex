@@ -21,8 +21,8 @@ defmodule Crypto.Pipeline.Maestro do
   @typep avg :: %{total_time: float, trip_count: non_neg_integer}
 
   @typep state :: %{
-    kraken_avg_round_trip: avg,
-    gdax_avg_round_trip: avg,
+    total_profit: float,
+    last_seen_profit: float,
   }
 
 
@@ -51,8 +51,36 @@ defmodule Crypto.Pipeline.Maestro do
     do: :ok
 
   def rinse_repeat(cycles_remaining) do
-    Maestro.run
-    Process.sleep(@cycle_interval)
+    t0 =
+      Timex.now |> Timex.to_unix
+
+    task =
+      Task.async(fn ->
+        Maestro.run
+      end)
+
+    case Task.yield(task, @cycle_interval) || Task.shutdown(task) do
+      {:ok, {buy, sell, profit, total_profit}} ->
+        spread =
+          sell.price - buy.price
+
+        IO.puts("#{stringify_exchange(buy.exchange)} $#{buy.price} X #{buy.volume} -> #{stringify_exchange(sell.exchange)} $#{sell.price} X #{sell.volume}")
+        IO.puts("\tSpread: $#{spread}")
+        IO.puts("\tProfit: $#{profit}")
+        IO.puts("\tTotal Profit: $#{total_profit}\n")
+
+      nil ->
+        IO.inspect("Failed to get a result this cycle.")
+        nil
+    end
+
+    t1 =
+      Timex.now |> Timex.to_unix
+
+    sleep_time =
+      @cycle_interval - (t1 - t0)
+
+    Process.sleep(sleep_time)
     Maestro.rinse_repeat(cycles_remaining - 1)
   end
 
@@ -69,8 +97,8 @@ defmodule Crypto.Pipeline.Maestro do
 
   def init(:ok) do
     state =
-      %{kraken_avg_round_trip: %{total_time: 0, trip_count: 0},
-        gdax_avg_round_trip: %{total_time: 0, trip_count: 0},
+      %{total_profit: 0.0,
+        last_seen_profit: nil,
        }
 
     {:ok, state}
@@ -83,8 +111,18 @@ defmodule Crypto.Pipeline.Maestro do
       |> Enum.map(&fetch_for_exchange/1)
       |> Task.yield_many(1_000)
       |> Enum.map(fn {task, {:ok, res}} ->
-        res || Task.shutdown(task, :brutal_kill)
+        case res do
+          {:ok, summary} ->
+            summary
+
+          {:error, :fetch_fail} ->
+            :fail
+
+          nil ->
+            Task.shutdown(task, :brutal_kill)
+        end
       end)
+      |> Enum.reject(&match?(:fail, &1))
 
     %{exchange: buy_exchange, ask: %{price: buy_price, volume: buy_volume}} =
       orders |> Enum.min_by(fn %{ask: ~M{price}} -> price end)
@@ -101,17 +139,25 @@ defmodule Crypto.Pipeline.Maestro do
     {buy, sell} =
       Quant.orders_for(ask: ask, bid: bid)
 
-    spread =
-      sell_price - buy_price
-
     profit =
-      Quant.arbitrage_profit([buy, sell])
+      Quant.arbitrage_profit(buy: buy, sell: sell)
 
-    IO.puts("#{buy_exchange} $#{buy_price} -> #{sell_exchange} $#{sell_price}")
-    IO.puts("\tSpread: $#{spread}")
-    IO.puts("\tProfit: $#{profit}\n")
+    updated_state =
+      case state.last_seen_profit == profit do
+        true ->
+          %{state | last_seen_profit: profit}
 
-    {:reply, :ok, state}
+        false ->
+          %{state |
+            total_profit: state.total_profit + profit,
+            last_seen_profit: profit,
+           }
+      end
+
+    result =
+      {buy, sell, profit, updated_state.total_profit}
+
+    {:reply, result, updated_state}
   end
 
 
@@ -126,18 +172,25 @@ defmodule Crypto.Pipeline.Maestro do
       t0 =
         Timex.now |> Timex.to_unix
 
-      ~M{bids, asks} =
+      result =
         apply(exchange, :fetch_order_book, [@currency_pair])
-
 
       t1 =
         Timex.now |> Timex.to_unix
 
-      %{exchange: exchange,
-        bid: bids |> hd,
-        ask: asks |> hd,
-        rtt: t1 - t0,
-      }
+      case result do
+        ~M{bids, asks} ->
+          summary =
+            %{exchange: exchange,
+              bid: bids |> hd,
+              ask: asks |> hd,
+              rtt: t1 - t0,
+            }
+
+          {:ok, summary}
+
+        _ -> {:error, :fetch_fail}
+      end
     end)
   end
 
@@ -145,5 +198,10 @@ defmodule Crypto.Pipeline.Maestro do
   @spec compute_avg(avg) :: float
   defp compute_avg(~M{total_time, trip_count}),
     do: total_time / trip_count
+
+
+  @spec stringify_exchange(module) :: String.t
+  defp stringify_exchange(exchange),
+    do: Module.split(exchange) |> List.last
 
 end

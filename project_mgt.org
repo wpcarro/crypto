@@ -1,0 +1,21 @@
+* Programming
+* DONE debug crashing Tasks
+* DONE matchmake buy and sell sides as permutations
+  * exchange -> orderbook map
+  * filter_map by `profitable?`
+  * {buy :: Order.t, sell: Order.t, profit :: float}
+  * Enum.max_by(...profit...)
+* TODO classify exchanges that support buy and sell sides
+* TODO ensure HTTPoison starts automatically
+* TODO ensure Maestro starts automatically
+* TODO respond to status code 429 and implement back off
+* TODO place successful orders with sandbox APIs
+* TODO implement high fidelity timing
+* TODO host on Amazon EC2 instance
+* TODO hook in twilio alerts for profits greater than $5
+* TODO integrate Coinbase wallet with GDAX exchange
+* TODO integrate Gemini wallet with exchange
+* TODO integrate Kraken wallet with exchange
+* Administration
+* TODO determine if we should withdraw profits from accounts (and incur fee) or keep profits around to make future buys
+* TODO register margin account on GDAX

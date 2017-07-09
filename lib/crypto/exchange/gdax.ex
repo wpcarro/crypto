@@ -24,7 +24,10 @@ defmodule Crypto.Exchange.GDAX do
     params =
       [level: 2]
 
-    HTTP.get(endpoint, params: params) |> order_book_from_raw
+    case HTTP.get!(endpoint, params: params) do
+      %HTTPoison.Response{body: body} ->
+        Poison.decode!(body) |> order_book_from_raw
+    end
   end
 
 
@@ -72,6 +75,29 @@ defmodule Crypto.Exchange.GDAX do
     end
 
     struct(OrderBook, asks: Enum.map(asks, decode_entry), bids: Enum.map(bids, decode_entry))
+  end
+
+
+  @spec buy(keyword) :: :ok
+  def buy(opts) do
+    product_id =
+      Keyword.fetch!(opts, :asset_pair) |> product_id
+
+    price =
+      Keyword.fetch!(opts, :price)
+
+    volume =
+      Keyword.fetch!(opts, :volume)
+
+    body =
+      %{side: "buy",
+        product_id: product_id,
+        price: price |> to_string,
+        size: volume |> to_string,
+        overdraft_enabled: true
+       }
+
+    HTTP.post!("/orders", body: body)
   end
 
 end

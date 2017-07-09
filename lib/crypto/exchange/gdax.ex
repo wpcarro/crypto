@@ -28,12 +28,23 @@ defmodule Crypto.Exchange.GDAX do
   end
 
 
-  def transaction_fee(_),
+  def transaction_fee(:eth),
     do: 0.003
+
+  def transaction_fee(_asset),
+    do: 0.0025
+
+
+  def withdrawal_fee(_asset),
+    do: 0.0025
 
 
   def execute_orders(_orders),
     do: :ok
+
+
+  def supported_assets,
+    do: MapSet.new([:eth, :btc, :ltc, :usd, :eur, :gbp])
 
 
 

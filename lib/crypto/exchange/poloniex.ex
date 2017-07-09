@@ -17,7 +17,12 @@ defmodule Crypto.Exchange.Poloniex do
   end
 
 
-  def transaction_fee do
+  def transaction_fee(_) do
+    raise("Not implemented!")
+  end
+
+
+  def withdrawal_fee(_) do
     raise("Not implemented!")
   end
 

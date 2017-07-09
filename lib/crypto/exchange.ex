@@ -12,6 +12,8 @@ defmodule Crypto.Exchange do
   # Types
   ################################################################################
 
+  @type t :: module
+  @type asset :: :eth | :btc | :ltc | :usd | :eur | :gbp
   @type asset_pair :: :eth_usd | :eth_btc | :btc_usd | :ltc_usd
 
 
@@ -21,7 +23,12 @@ defmodule Crypto.Exchange do
 
   @callback fetch_order_book(asset_pair) :: OrderBook.t
 
-  @callback transaction_fee(Order.t) :: float
+  @callback transaction_fee(asset) :: float
+
+  @callback withdrawal_fee(asset) :: float
 
   @callback execute_orders([Order.t]) :: :ok | {:error, reason :: any}
+
+  @callback supported_assets :: MapSet.t(asset)
+
 end

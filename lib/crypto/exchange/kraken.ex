@@ -37,6 +37,10 @@ defmodule Crypto.Exchange.Kraken do
     do: 0.0026
 
 
+  def withdrawal_fee(_),
+    do: 0.0026
+
+
   def execute_orders(_orders),
     do: :ok
 

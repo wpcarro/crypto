@@ -4,6 +4,8 @@ defmodule Crypto.Core.Order do
 
   """
 
+  alias Crypto.Exchange
+
 
 
   ################################################################################
@@ -17,6 +19,7 @@ defmodule Crypto.Core.Order do
     price: float,
     volume: float,
     exchange: module,
+    asset: Exchange.asset,
   }
 
 
@@ -24,6 +27,7 @@ defmodule Crypto.Core.Order do
     side: nil,
     price: nil,
     volume: nil,
-    exchange: nil
+    exchange: nil,
+    asset: nil
   ]
 end

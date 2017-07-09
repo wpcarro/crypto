@@ -27,8 +27,12 @@ defmodule Crypto.Exchange.Gemini do
   end
 
 
-  def transaction_fee(_),
-    do: raise("Not implementing")
+  def transaction_fee(_asset),
+    do: raise("Not implemented")
+
+
+  def withdrawal_fee(_asset),
+    do: raise("Not implemented")
 
 
   def execute_orders(_order),

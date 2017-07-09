@@ -7,6 +7,7 @@ defmodule Crypto.Pipeline.Maestro do
   alias __MODULE__
   alias Crypto.Exchange.{GDAX, Gemini, Kraken, XBTCE}
   alias Crypto.Core.OrderBook
+  alias Crypto.Pipeline.Quant
 
   @cycle_interval 3_000
   @cycle_count 10
@@ -31,7 +32,7 @@ defmodule Crypto.Pipeline.Maestro do
   ################################################################################
 
   @currency_pair :eth_usd
-  @supported_exchanges [GDAX, Kraken, Gemini, XBTCE]
+  @supported_exchanges [GDAX, Kraken, Gemini]
 
 
 
@@ -85,13 +86,30 @@ defmodule Crypto.Pipeline.Maestro do
         res || Task.shutdown(task, :brutal_kill)
       end)
 
-    %{exchange: buy_exchange, ask: %{price: buy_price}} =
+    %{exchange: buy_exchange, ask: %{price: buy_price, volume: buy_volume}} =
       orders |> Enum.min_by(fn %{ask: ~M{price}} -> price end)
 
-    %{exchange: sell_exchange, ask: %{price: sell_price}} =
+    %{exchange: sell_exchange, ask: %{price: sell_price, volume: sell_volume}} =
       orders |> Enum.max_by(fn %{bid: ~M{price}} -> price end)
 
-    IO.inspect("#{buy_exchange} $#{buy_price} -> #{sell_exchange} $#{sell_price}")
+    ask =
+      %{price: buy_price, volume: buy_volume, exchange: buy_exchange}
+
+    bid =
+      %{price: sell_price, volume: sell_volume, exchange: sell_exchange}
+
+    {buy, sell} =
+      Quant.orders_for(ask: ask, bid: bid)
+
+    spread =
+      sell_price - buy_price
+
+    profit =
+      Quant.arbitrage_profit([buy, sell])
+
+    IO.puts("#{buy_exchange} $#{buy_price} -> #{sell_exchange} $#{sell_price}")
+    IO.puts("\tSpread: $#{spread}")
+    IO.puts("\tProfit: $#{profit}\n")
 
     {:reply, :ok, state}
   end
@@ -111,6 +129,7 @@ defmodule Crypto.Pipeline.Maestro do
       ~M{bids, asks} =
         apply(exchange, :fetch_order_book, [@currency_pair])
 
+
       t1 =
         Timex.now |> Timex.to_unix
 
@@ -126,18 +145,5 @@ defmodule Crypto.Pipeline.Maestro do
   @spec compute_avg(avg) :: float
   defp compute_avg(~M{total_time, trip_count}),
     do: total_time / trip_count
-
-
-  @spec compute_profit(keyword) :: float
-  defp compute_profit(opts) do
-    {_exchange, buy} =
-      Keyword.get(opts, :buy)
-
-    {exchange, sell} =
-      Keyword.get(opts, :sell)
-
-    sell * (1 - apply(exchange, :transaction_fee, [])) -
-    buy  * (1 + apply(exchange, :transaction_fee, []))
-  end
 
 end

@@ -9,7 +9,7 @@ defmodule Crypto.Pipeline.Maestro do
   alias Crypto.Core.OrderBook
   alias Crypto.Pipeline.Quant
 
-  @cycle_interval 3_000
+  @cycle_interval 2_000
   @cycle_count 10
 
 
@@ -64,9 +64,18 @@ defmodule Crypto.Pipeline.Maestro do
             spread =
               sell.price - buy.price
 
-            IO.puts("#{cycles_remaining}. #{stringify_exchange(buy.exchange)} $#{buy.price} X #{buy.volume} -> #{stringify_exchange(sell.exchange)} $#{sell.price} X #{sell.volume}")
-            IO.puts("\tSpread: $#{spread}")
-            IO.puts("\tProfit: $#{profit}\n")
+            print_fn =
+              case profit > 0.0 do
+                true  ->
+                  fn msg -> [:green, msg] |> IO.ANSI.format |> IO.puts end
+
+                false ->
+                  fn msg -> [:red, msg] |> IO.ANSI.format |> IO.puts end
+              end
+
+            print_fn.("#{cycles_remaining}. #{stringify_exchange(buy.exchange)} $#{buy.price} X #{buy.volume} -> #{stringify_exchange(sell.exchange)} $#{sell.price} X #{sell.volume}")
+            print_fn.("\tSpread: $#{spread}")
+            print_fn.("\tProfit: $#{profit}\n")
 
           nil ->
             IO.puts("#{cycles_remaining} Holding...\n")
@@ -201,8 +210,8 @@ defmodule Crypto.Pipeline.Maestro do
             exchange
 
           value =
-            %{bid: bids |> hd,
-              ask: asks |> hd,
+            %{bid: bids |> List.first,
+              ask: asks |> List.first,
               rtt: t1 - t0,
             }
 

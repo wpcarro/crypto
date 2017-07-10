@@ -11,7 +11,7 @@ defmodule Crypto.Exchange.GDAX.HTTP do
   # Constants
   ################################################################################
 
-  @base_url Application.get_env(:crypto, :gdax_url) |> IO.inspect
+  @base_url Application.get_env(:crypto, :gdax_url)
   @api_key Application.get_env(:crypto, :gdax_api_key)
   @api_secret Application.get_env(:crypto, :gdax_api_secret)
   @api_password Application.get_env(:crypto, :gdax_api_password)
@@ -36,7 +36,16 @@ defmodule Crypto.Exchange.GDAX.HTTP do
     signed_headers =
       headers |> sign_headers("get", endpoint)
 
-    HTTPoison.get!(url, signed_headers, opts)
+    decode? =
+      Keyword.get(opts, :decode, false)
+
+    result =
+      HTTPoison.get!(url, signed_headers, opts)
+
+    case decode? do
+      true  -> result |> Map.get(:body) |> Poison.decode!
+      false -> result
+    end
   end
 
 
@@ -57,7 +66,43 @@ defmodule Crypto.Exchange.GDAX.HTTP do
     signed_headers =
       headers |> sign_headers("post", endpoint, body)
 
-    HTTPoison.post!(url, Poison.encode!(body), signed_headers, opts)
+    decode? =
+      Keyword.get(opts, :decode, false)
+
+    result =
+      HTTPoison.post!(url, Poison.encode!(body), signed_headers, opts)
+
+    case decode? do
+      true  -> result |> Map.get(:body) |> Poison.decode!
+      false -> result
+    end
+  end
+
+
+  def delete!(endpoint, opts \\ []) do
+    url =
+      Path.join(@base_url, endpoint)
+
+    headers =
+      %{"CB-ACCESS-KEY" => @api_key,
+        "CB-ACCESS-PASSPHRASE" => @api_password,
+        "CB-ACCESS-TIMESTAMP" => Timex.now |> Timex.to_unix,
+        "Content-Type" => "application/json"
+       }
+
+    signed_headers =
+      headers |> sign_headers("delete", endpoint)
+
+    decode? =
+      Keyword.get(opts, :decode, false)
+
+    result =
+      HTTPoison.delete!(url, signed_headers, opts)
+
+    case decode? do
+      true  -> result |> Map.get(:body) |> Poison.decode!
+      false -> result
+    end
   end
 
 
@@ -79,8 +124,6 @@ defmodule Crypto.Exchange.GDAX.HTTP do
 
     data =
       inspect(timestamp) <> String.upcase(method) <> endpoint <> encoded_body
-
-    IO.puts(data)
 
     key =
       Base.decode64!(@api_secret)

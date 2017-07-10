@@ -33,4 +33,8 @@ defmodule Crypto.Exchange do
 
   @callback supported_sides :: MapSet.t(Order.side)
 
+  @callback send_to_exchange(keyword) :: :ok | {:error, reason :: any}
+
+  @callback wallet_address(asset) :: binary
+
 end

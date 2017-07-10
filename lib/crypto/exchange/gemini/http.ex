@@ -32,12 +32,38 @@ defmodule Crypto.Exchange.Gemini.HTTP do
   function.
 
   """
-  @spec public_get(Path.t, keyword, keyword) :: HTTPoison
+  @spec public_get(Path.t, keyword, keyword) :: HTTPoison.Response.t
   def public_get(endpoint, headers \\ [], opts \\ []) do
     url =
       Path.join(@base_url, endpoint)
 
     HTTPoison.get!(url, headers, opts)
   end
+
+
+  @doc """
+  Fetches data from Gemini's private API. Forwards `headers` and `opts` to the `HTTPoison.get!/3`
+  function.
+
+  """
+  @spec private_get(Path.t, keyword, keyword) :: HTTPoison.Response.t
+  def private_get(_endpoint, _headers, _opts) do
+    raise("Not implemented")
+  end
+
+
+  @doc """
+  Makes post requests to Gemini's API.
+
+  """
+  @spec post!(Path.t, keyword) :: HTTPoison.Response.t
+  def post!(_endpoint, _opts) do
+    raise("Not implemented")
+  end
+
+
+  @spec api_version :: binary
+  def api_version,
+    do: @api_version
 
 end

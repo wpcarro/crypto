@@ -35,7 +35,7 @@ defmodule Crypto.Exchange.Gemini do
 
 
   def withdrawal_fee(_asset),
-    do: 0.0025
+    do: 0.0
 
 
   def execute_orders(_order),
@@ -48,6 +48,45 @@ defmodule Crypto.Exchange.Gemini do
 
   def supported_sides,
     do: MapSet.new([:buy])
+
+
+  def send_to_exchange(opts) do
+    asset =
+      Keyword.fetch!(opts, :asset) |> to_string
+
+    volume =
+      Keyword.fetch!(opts, :volume) |> to_string
+
+    exchange =
+      Keyword.fetch!(opts, :exchange)
+
+    address =
+      apply(exchange, :wallet_address, [asset])
+
+    api_version =
+      HTTP.api_version
+
+    request =
+      "/#{api_version}/withdraw/#{asset}"
+
+    body = %{
+      request: request,
+      amount: volume,
+      nonce: "???",
+      address: address,
+    }
+
+    case HTTP.post!("/withdraw/#{asset}", body: body) do
+      %HTTPoison.Response{body: body} ->
+        %{"destination" => ^address, "amount" => ^volume} =
+          Poison.decode!(body)
+
+        :ok
+
+      error ->
+        IO.inspect("Withdrawal error. #{inspect(error)}")
+    end
+  end
 
 
 

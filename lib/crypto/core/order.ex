@@ -19,7 +19,7 @@ defmodule Crypto.Core.Order do
     price: float,
     volume: float,
     exchange: module,
-    asset: Exchange.asset,
+    asset_pair: Exchange.asset_pair,
   }
 
 
@@ -28,6 +28,6 @@ defmodule Crypto.Core.Order do
     price: nil,
     volume: nil,
     exchange: nil,
-    asset: nil
+    asset_pair: nil
   ]
 end

@@ -10,7 +10,7 @@ defmodule Crypto.Pipeline.Quant do
   # Public API
   ################################################################################
 
-  @max_coin_position 10
+  @max_coin_position 100
 
 
 
@@ -27,6 +27,9 @@ defmodule Crypto.Pipeline.Quant do
   """
   @spec orders_for(keyword) :: {buy :: Order.t, sell :: Order.t}
   def orders_for(opts \\ []) do
+    asset_pair =
+      Keyword.fetch!(opts, :asset_pair)
+
     %{price: buy_price, volume: buy_volume, exchange: buy_exchange} =
       Keyword.fetch!(opts, :ask)
 
@@ -42,6 +45,7 @@ defmodule Crypto.Pipeline.Quant do
         exchange: buy_exchange,
         price: buy_price,
         volume: volume,
+        asset_pair: asset_pair,
       }
 
     sell =
@@ -49,7 +53,8 @@ defmodule Crypto.Pipeline.Quant do
         side: :sell,
         exchange: sell_exchange,
         price: sell_price,
-        volume: volume
+        volume: volume,
+        asset_pair: asset_pair,
       }
 
     {buy, sell}
@@ -65,7 +70,7 @@ defmodule Crypto.Pipeline.Quant do
     %Order{
       side: :buy,
       exchange: buy_exchange,
-      asset: buy_asset,
+      asset_pair: buy_asset,
       volume: buy_volume,
       price: buy_price,
     } = Keyword.fetch!(opts, :buy)
@@ -73,7 +78,7 @@ defmodule Crypto.Pipeline.Quant do
     %Order{
       side: :sell,
       exchange: sell_exchange,
-      asset: sell_asset,
+      asset_pair: sell_asset,
       volume: sell_volume,
       price: sell_price,
     } = Keyword.fetch!(opts, :sell)

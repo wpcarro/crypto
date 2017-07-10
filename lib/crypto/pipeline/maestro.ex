@@ -164,7 +164,7 @@ defmodule Crypto.Pipeline.Maestro do
       end)
       |> Stream.map(fn {ask, bid} ->
         {buy_order, sell_order} =
-          Quant.orders_for(ask: ask, bid: bid)
+          Quant.orders_for(asset_pair: @currency_pair, ask: ask, bid: bid)
 
         profit =
           Quant.arbitrage_profit(buy: buy_order, sell: sell_order)

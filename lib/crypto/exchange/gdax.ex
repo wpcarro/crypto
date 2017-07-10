@@ -34,15 +34,18 @@ defmodule Crypto.Exchange.GDAX do
   end
 
 
-  def transaction_fee(:eth),
+  def transaction_fee(:eth_usd),
     do: 0.003
 
-  def transaction_fee(_asset),
+  def transaction_fee(:btc_usd),
     do: 0.0025
 
 
-  def withdrawal_fee(_asset),
-    do: 0.0025
+  def withdrawal_fee(:eth_usd),
+    do: 0.0
+
+  def withdrawal_fee(:btc_usd),
+    do: 0.0
 
 
   def execute_orders(_orders),

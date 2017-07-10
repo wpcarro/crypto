@@ -23,9 +23,9 @@ defmodule Crypto.Exchange do
 
   @callback fetch_order_book(asset_pair) :: OrderBook.t
 
-  @callback transaction_fee(asset) :: float
+  @callback transaction_fee(asset_pair) :: float
 
-  @callback withdrawal_fee(asset) :: float
+  @callback withdrawal_fee(asset_pair) :: float
 
   @callback execute_orders([Order.t]) :: :ok | {:error, reason :: any}
 

@@ -16,6 +16,15 @@ defmodule Crypto.Exchange.Gemini do
 
 
   ################################################################################
+  # Constants
+  ################################################################################
+
+  @gemini_btc_wallet Application.get_env(:crypto, :gemini_btc_wallet)
+  @gemini_eth_wallet Application.get_env(:crypto, :gemini_eth_wallet)
+
+
+
+  ################################################################################
   # Callback Definitions
   ################################################################################
 
@@ -87,6 +96,10 @@ defmodule Crypto.Exchange.Gemini do
         IO.inspect("Withdrawal error. #{inspect(error)}")
     end
   end
+
+
+  def wallet_address(:eth), do: @gemini_eth_wallet
+  def wallet_address(:btc), do: @gemini_btc_wallet
 
 
 

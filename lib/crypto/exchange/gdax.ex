@@ -51,7 +51,7 @@ defmodule Crypto.Exchange.GDAX do
 
 
   ################################################################################
-  # Callback Definitions
+  # Constants
   ################################################################################
 
   @coinbase_btc_wallet Application.get_env(:crypto, :coinbase_btc_wallet)
@@ -85,11 +85,11 @@ defmodule Crypto.Exchange.GDAX do
   def transaction_fee(:btc_usd),
     do: 0.0025
 
+  def transaction_fee(:eth_btc),
+    do: 0.003
 
-  def withdrawal_fee(:eth_usd),
-    do: 0.0
 
-  def withdrawal_fee(:btc_usd),
+  def withdrawal_fee(_asset_pair),
     do: 0.0
 
 

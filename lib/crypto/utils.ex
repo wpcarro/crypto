@@ -11,7 +11,7 @@ defmodule Crypto.Utils do
   """
   @spec parse_float(binary) :: float
   def parse_float(input) do
-    {result, ""} =
+    {result, _} =
       Float.parse(input)
 
     result
@@ -24,7 +24,7 @@ defmodule Crypto.Utils do
   """
   @spec parse_int(binary) :: integer
   def parse_int(input) do
-    {result, ""} =
+    {result, _} =
       Integer.parse(input)
 
     result

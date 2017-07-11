@@ -26,12 +26,21 @@ defmodule Crypto.Exchange.Kraken.HTTP do
   function.
 
   """
-  @spec public_get(Path.t, keyword, keyword) :: HTTPoison.Response.t
-  def public_get(endpoint, headers \\ [], opts \\ []) do
+  @spec public_get(Path.t, keyword) :: HTTPoison.Response.t
+  def public_get(endpoint, opts \\ []) do
     url =
       Path.join([@base_url, "public", endpoint])
 
-    HTTPoison.get!(url, headers, opts)
+    decode? =
+      Keyword.get(opts, :decode, false)
+
+    result =
+      HTTPoison.get!(url, [], opts)
+
+    case decode? do
+      true  -> result |> Map.get(:body) |> Poison.decode!
+      false -> result
+    end
   end
 
 

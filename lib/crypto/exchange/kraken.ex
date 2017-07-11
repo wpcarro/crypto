@@ -23,7 +23,7 @@ defmodule Crypto.Exchange.Kraken do
     params =
       [pair: asset_pair]
 
-    case HTTP.public_get("Depth", [], params: params) do
+    case HTTP.public_get("Depth", params: params) do
       %HTTPoison.Response{body: body} ->
         res =
           Poison.decode!(body)
@@ -60,6 +60,7 @@ defmodule Crypto.Exchange.Kraken do
 
   @spec to_asset_pair(Exchange.asset_pair) :: binary
   defp to_asset_pair(:eth_usd), do: "XETHZUSD"
+  defp to_asset_pair(:btc_usd), do: "XXBTZUSD"
 
 
   @spec order_book_from_raw(map) :: OrderBook.t

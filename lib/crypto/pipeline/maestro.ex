@@ -5,7 +5,7 @@ defmodule Crypto.Pipeline.Maestro do
 
   import ShorterMaps
   alias __MODULE__
-  alias Crypto.Exchange.{GDAX, Gemini, Kraken, XBTCE}
+  alias Crypto.Exchange.{GDAX, Gemini, Kraken, Bitfinex}
   alias Crypto.Core.OrderBook
   alias Crypto.Pipeline.Quant
 
@@ -28,11 +28,10 @@ defmodule Crypto.Pipeline.Maestro do
   ################################################################################
 
   @currency_pair :eth_usd
-  @supported_exchanges [GDAX, Kraken, Gemini]
+  @supported_exchanges [GDAX, Bitfinex]
   @pairable_exchanges [
-    {GDAX, Kraken}, {Kraken, GDAX},
-    {Gemini, GDAX}, {Gemini, Kraken},
-  ] # todo impl pairing function
+    {GDAX, Bitfinex}, {Bitfinex, GDAX},
+  ]
 
 
 
@@ -73,9 +72,20 @@ defmodule Crypto.Pipeline.Maestro do
                   fn msg -> [:red, msg] |> IO.ANSI.format |> IO.puts end
               end
 
+            buy_total =
+              buy.price * buy.volume
+
+            sell_total =
+              sell.price * sell.volume
+
+            roi =
+              profit / (buy_total + sell_total) |> Float.round(4)
+
             print_fn.("#{cycles_remaining}. #{stringify_exchange(buy.exchange)} $#{buy.price} X #{buy.volume} -> #{stringify_exchange(sell.exchange)} $#{sell.price} X #{sell.volume}")
+            print_fn.("\t#{stringify_exchange(buy.exchange)} $#{buy_total} -> #{stringify_exchange(sell.exchange)} $#{sell_total}")
             print_fn.("\tSpread: $#{spread}")
-            print_fn.("\tProfit: $#{profit}\n")
+            print_fn.("\tProfit: $#{profit}")
+            print_fn.("\tROI: #{roi * 100}%\n")
 
           nil ->
             IO.puts("#{cycles_remaining} Holding...\n")

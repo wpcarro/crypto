@@ -1,9 +1,9 @@
-defmodule Crypto.Pipeline.QuantTest do
+defmodule Cryptocurrency.Pipeline.QuantTest do
   use ExUnit.Case, async: true
 
-  alias Crypto.Core.Order
-  alias Crypto.Exchange.{GDAX, Gemini}
-  alias Crypto.Pipeline.Quant
+  alias Cryptocurrency.Core.Order
+  alias Cryptocurrency.Exchange.{GDAX, Gemini}
+  alias Cryptocurrency.Pipeline.Quant
 
   describe "orders_for" do
     test "generates the buy and sell orders given a particular bid and ask" do

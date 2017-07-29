@@ -1,6 +1,6 @@
-defmodule Crypto.Exchange.Bitfinex do
+defmodule Cryptocurrency.Exchange.Bitfinex do
   @moduledoc """
-  Behaviour module implementing the `Crypto.Exchange` callbacks for Bitfinex.
+  Behaviour module implementing the `Cryptocurrency.Exchange` callbacks for Bitfinex.
 
   Bitfinex supports margin trading through its API meaning our algorithm can take both buy and sell
   sides of arbitrage opportunities.
@@ -19,11 +19,11 @@ defmodule Crypto.Exchange.Bitfinex do
 
   """
 
-  alias Crypto.Utils
-  alias Crypto.Core.OrderBook
-  alias Crypto.Exchange.Bitfinex.HTTP
+  alias Cryptocurrency.Utils
+  alias Cryptocurrency.Core.OrderBook
+  alias Cryptocurrency.Exchange.Bitfinex.HTTP
 
-  @behaviour Crypto.Exchange
+  @behaviour Cryptocurrency.Exchange
 
 
 

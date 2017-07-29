@@ -1,4 +1,4 @@
-defmodule Crypto.Exchange.Kraken.HTTP do
+defmodule Cryptocurrency.Exchange.Kraken.HTTP do
   @moduledoc """
   HTTP Driver for Kraken communication. This module bakes the base URL into the requests. It also
   signs the requests according to the Kraken specifications.
@@ -12,8 +12,8 @@ defmodule Crypto.Exchange.Kraken.HTTP do
 
   @api_version "0"
   @base_url "https://api.kraken.com/#{@api_version}"
-  @api_key Application.get_env(:crypto, :kraken_api_key)
-  @api_secret Application.get_env(:crypto, :kraken_api_secret)
+  @api_key Application.get_env(:cryptocurrency, :kraken_api_key)
+  @api_secret Application.get_env(:cryptocurrency, :kraken_api_secret)
 
 
 

@@ -1,10 +1,10 @@
-defmodule Crypto.Pipeline.Pool do
+defmodule Cryptocurrency.Pipeline.Pool do
   @moduledoc """
   Module responsible for matchmaking exchanges based on the currencies they support.
 
   """
 
-  alias Crypto.Exchange
+  alias Cryptocurrency.Exchange
 
 
 

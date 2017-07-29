@@ -1,25 +1,20 @@
-defmodule Crypto.Pipeline.Maestro do
-  @moduledoc false
+defmodule Cryptocurrency.Pipeline.Maestro do
+  @moduledoc """
+  Module responsible for coordinating the Pipeline workers.
+
+  The Maestro talks to the Matchmaker and the Quant and synthesizes the results from each.
+
+  """
 
   use GenServer
 
   import ShorterMaps
   alias __MODULE__
-  alias Crypto.Exchange.{GDAX, Gemini, Kraken, Bitfinex}
-  alias Crypto.Core.OrderBook
-  alias Crypto.Pipeline.Quant
+  alias Cryptocurrency.Exchange.{GDAX, Bitfinex}
+  alias Cryptocurrency.Pipeline.{Matchmaker, Quant}
 
   @cycle_interval 2_000
   @cycle_count 10
-
-
-
-  ################################################################################
-  # Types
-  ################################################################################
-
-  @typep avg :: %{total_time: float, trip_count: non_neg_integer}
-  @typep state :: %{}
 
 
 
@@ -29,9 +24,7 @@ defmodule Crypto.Pipeline.Maestro do
 
   @currency_pair :eth_usd
   @supported_exchanges [GDAX, Bitfinex]
-  @pairable_exchanges [
-    {GDAX, Bitfinex}, {Bitfinex, GDAX},
-  ]
+  @pairable_exchanges Matchmaker.pairable_exchanges(@supported_exchanges)
 
 
 
@@ -54,7 +47,7 @@ defmodule Crypto.Pipeline.Maestro do
       Timex.now |> Timex.to_unix
 
     task =
-      Task.async(fn -> Maestro.run end)
+      Task.async(fn -> Maestro.cycle end)
 
     case Task.yield(task, @cycle_interval) || Task.shutdown(task) do
       {:ok, result} ->
@@ -107,8 +100,8 @@ defmodule Crypto.Pipeline.Maestro do
   end
 
 
-  def run do
-    GenServer.call(__MODULE__, {:run})
+  def cycle do
+    GenServer.call(__MODULE__, {:cycle})
   end
 
 
@@ -125,7 +118,7 @@ defmodule Crypto.Pipeline.Maestro do
   end
 
 
-  def handle_call({:run}, _fr, state) do
+  def handle_call({:cycle}, _fr, state) do
     exchange_to_orderbook =
       @supported_exchanges
       |> Enum.map(&fetch_for_exchange/1)
@@ -161,7 +154,7 @@ defmodule Crypto.Pipeline.Maestro do
 
     case pairable_exchanges do
       [] -> IO.inspect("No pairable exchanges")
-      _  -> IO.inspect(pairable_exchanges)
+      _  -> :ok
     end
 
     result =
@@ -231,11 +224,6 @@ defmodule Crypto.Pipeline.Maestro do
       end
     end)
   end
-
-
-  @spec compute_avg(avg) :: float
-  defp compute_avg(~M{total_time, trip_count}),
-    do: total_time / trip_count
 
 
   @spec stringify_exchange(module) :: String.t

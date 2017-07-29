@@ -1,4 +1,4 @@
-defmodule Crypto.Exchange.GDAX.HTTP do
+defmodule Cryptocurrency.Exchange.GDAX.HTTP do
   @moduledoc """
   HTTP Driver for GDAX communication. This module bakes the base URL into the requests. It also
   signs the requests according to the GDAX specifications.
@@ -11,10 +11,10 @@ defmodule Crypto.Exchange.GDAX.HTTP do
   # Constants
   ################################################################################
 
-  @base_url Application.get_env(:crypto, :gdax_url)
-  @api_key Application.get_env(:crypto, :gdax_api_key)
-  @api_secret Application.get_env(:crypto, :gdax_api_secret)
-  @api_password Application.get_env(:crypto, :gdax_api_password)
+  @base_url Application.get_env(:cryptocurrency, :gdax_url)
+  @api_key Application.get_env(:cryptocurrency, :gdax_api_key)
+  @api_secret Application.get_env(:cryptocurrency, :gdax_api_secret)
+  @api_password Application.get_env(:cryptocurrency, :gdax_api_password)
 
 
 

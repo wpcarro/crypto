@@ -5,15 +5,20 @@
   * filter_map by `profitable?`
   * {buy :: Order.t, sell: Order.t, profit :: float}
   * Enum.max_by(...profit...)
+* DONE place successful orders with sandbox APIs
+* DONE genericize wallet actions
+  * wallets use cold storage and hot wallets so the sending address differs from receipt address
+  * transaction:  account -> account
+  * deposit:      bank -> account
+  * withdraw:     account -> bank
+* DONE integrate Coinbase wallet with GDAX exchange
 * TODO classify exchanges that support buy and sell sides
 * TODO ensure HTTPoison starts automatically
 * TODO ensure Maestro starts automatically
 * TODO respond to status code 429 and implement back off
-* TODO place successful orders with sandbox APIs
 * TODO implement high fidelity timing
 * TODO host on Amazon EC2 instance
 * TODO hook in twilio alerts for profits greater than $5
-* TODO integrate Coinbase wallet with GDAX exchange
 * TODO integrate Gemini wallet with exchange
 * TODO integrate Kraken wallet with exchange
 * Administration

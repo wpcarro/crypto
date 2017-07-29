@@ -1,17 +1,17 @@
-defmodule Crypto.Exchange.Gemini do
+defmodule Cryptocurrency.Exchange.Gemini do
   @moduledoc """
-  Behaviour module implementing the `Crypto.Exchange` callbacks for Kraken.
+  Behaviour module implementing the `Cryptocurrency.Exchange` callbacks for Kraken.
 
   At this time, Gemini has dropped support for its margin trading through its API. This means that
   our algorithm can only buy from Gemini.
 
   """
 
-  alias Crypto.Utils
-  alias Crypto.Core.OrderBook
-  alias Crypto.Exchange.Gemini.HTTP
+  alias Cryptocurrency.Utils
+  alias Cryptocurrency.Core.OrderBook
+  alias Cryptocurrency.Exchange.Gemini.HTTP
 
-  @behaviour Crypto.Exchange
+  @behaviour Cryptocurrency.Exchange
 
 
 
@@ -19,8 +19,8 @@ defmodule Crypto.Exchange.Gemini do
   # Constants
   ################################################################################
 
-  @gemini_btc_wallet Application.get_env(:crypto, :gemini_btc_wallet)
-  @gemini_eth_wallet Application.get_env(:crypto, :gemini_eth_wallet)
+  @gemini_btc_wallet Application.get_env(:cryptocurrency, :gemini_btc_wallet)
+  @gemini_eth_wallet Application.get_env(:cryptocurrency, :gemini_eth_wallet)
 
 
 

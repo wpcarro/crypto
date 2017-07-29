@@ -1,8 +1,8 @@
-defmodule Crypto.Mixfile do
+defmodule Cryptocurrency.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :crypto,
+    [app: :cryptocurrency,
      version: "0.1.0",
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
@@ -17,7 +17,7 @@ defmodule Crypto.Mixfile do
     # Specify extra applications you'll use from Erlang/Elixir
     [extra_applications: [:logger],
      applications: [:httpoison],
-     mod: {Crypto.Application, []}]
+     mod: {Cryptocurrency.Application, []}]
   end
 
   # Dependencies can be Hex packages:

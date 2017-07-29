@@ -1,14 +1,14 @@
-defmodule Crypto.Exchange.Kraken do
+defmodule Cryptocurrency.Exchange.Kraken do
   @moduledoc """
-  Behaviour module implementing the `Crypto.Exchange` callbacks for Kraken.
+  Behaviour module implementing the `Cryptocurrency.Exchange` callbacks for Kraken.
 
   """
 
-  alias Crypto.Utils
-  alias Crypto.Core.OrderBook
-  alias Crypto.Exchange.Kraken.HTTP
+  alias Cryptocurrency.Utils
+  alias Cryptocurrency.Core.OrderBook
+  alias Cryptocurrency.Exchange.Kraken.HTTP
 
-  @behaviour Crypto.Exchange
+  @behaviour Cryptocurrency.Exchange
 
 
 

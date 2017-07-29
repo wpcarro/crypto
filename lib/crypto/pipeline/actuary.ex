@@ -1,3 +1,3 @@
-defmodule Crypto.Pipeline.Actuary do
+defmodule Cryptocurrency.Pipeline.Actuary do
   @moduledoc false
 end

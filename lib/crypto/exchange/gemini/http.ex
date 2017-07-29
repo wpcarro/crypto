@@ -1,4 +1,4 @@
-defmodule Crypto.Exchange.Gemini.HTTP do
+defmodule Cryptocurrency.Exchange.Gemini.HTTP do
   @moduledoc """
   HTTP Driver for Gemini communication. This module bakes the base URL into the requests. It also
   signs the requests according to the Gemini specifications.
@@ -20,8 +20,8 @@ defmodule Crypto.Exchange.Gemini.HTTP do
 
   @api_version "v1"
   @base_url "https://api.gemini.com/#{@api_version}"
-  @gemini_api_key Application.get_env(:crypto, :gemini_api_key)
-  @gemini_api_secret Application.get_env(:crypto, :gemini_api_secret)
+  @gemini_api_key Application.get_env(:cryptocurrency, :gemini_api_key)
+  @gemini_api_secret Application.get_env(:cryptocurrency, :gemini_api_secret)
 
 
 

@@ -1,4 +1,4 @@
-defmodule Crypto.Exchange.XBTCE.HTTP do
+defmodule Cryptocurrency.Exchange.XBTCE.HTTP do
   @moduledoc """
   HTTP Driver for xBTCe communication. This module bakes the base URL into the requests. It also
   signs the requests per the xBTCe specifications.

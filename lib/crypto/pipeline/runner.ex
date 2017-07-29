@@ -1,3 +1,3 @@
-defmodule Crypto.Pipeline.Runner do
+defmodule Cryptocurrency.Pipeline.Runner do
   @moduledoc false
 end

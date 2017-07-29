@@ -1,4 +1,4 @@
-defmodule Crypto.Exchange.Bitfinex.HTTP do
+defmodule Cryptocurrency.Exchange.Bitfinex.HTTP do
   @moduledoc """
   HTTP Driver for GDAX communication. This module bakes the base URL into the requests. It also
   signs the requests according to the GDAX specifications.
@@ -13,8 +13,8 @@ defmodule Crypto.Exchange.Bitfinex.HTTP do
 
   @api_version "v1"
   @base_url "https://api.bitfinex.com/#{@api_version}"
-  @api_key Application.get_env(:crypto, :bitfinex_api_key)
-  @api_secret Application.get_env(:crypto, :bitfinex_api_secret)
+  @api_key Application.get_env(:cryptocurrency, :bitfinex_api_key)
+  @api_secret Application.get_env(:cryptocurrency, :bitfinex_api_secret)
 
 
 

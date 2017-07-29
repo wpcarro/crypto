@@ -1,10 +1,10 @@
-defmodule Crypto.Core.Order do
+defmodule Cryptocurrency.Core.Order do
   @moduledoc """
   Module defining the structured `Order.t` for this application.
 
   """
 
-  alias Crypto.Exchange
+  alias Cryptocurrency.Exchange
 
 
 

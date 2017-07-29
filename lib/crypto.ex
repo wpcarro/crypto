@@ -1,6 +1,6 @@
-defmodule Crypto do
+defmodule Cryptocurrency do
   @moduledoc """
-  Documentation for Crypto.
+  Documentation for Cryptocurrency.
 
   """
 end

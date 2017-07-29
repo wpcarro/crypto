@@ -1,4 +1,4 @@
-defmodule Crypto.Core.OrderBook do
+defmodule Cryptocurrency.Core.OrderBook do
   @moduledoc """
   Module defining the structured `OrderBook.t` for this application.
 

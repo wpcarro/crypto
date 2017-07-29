@@ -1,10 +1,10 @@
-defmodule Crypto.Exchange do
+defmodule Cryptocurrency.Exchange do
   @moduledoc """
   Module defining the Exchange `behaviour` callbacks for children modules.
 
   """
 
-  alias Crypto.Core.{Order, OrderBook}
+  alias Cryptocurrency.Core.{Order, OrderBook}
 
 
 

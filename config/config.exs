@@ -5,7 +5,7 @@ use Mix.Config
 # false -> sandbox
 case true do
   true ->
-    config :crypto,
+    config :cryptocurrency,
       # Kraken
       kraken_api_key: File.read!("config/secrets/kraken_api_key.txt") |> String.trim,
       kraken_api_secret: File.read!("config/secrets/kraken_api_secret.txt") |> String.trim,
@@ -26,10 +26,13 @@ case true do
       gemini_eth_wallet: File.read!("config/secrets/gemini_eth_wallet.txt") |> String.trim,
       # Bitfinex
       bitfinex_api_key: File.read!("config/secrets/bitfinex_api_key.txt") |> String.trim,
-      bitfinex_api_secret: File.read!("config/secrets/bitfinex_api_secret.txt") |> String.trim
+      bitfinex_api_secret: File.read!("config/secrets/bitfinex_api_secret.txt") |> String.trim,
+      # Bitmex
+      bitmex_api_key: File.read!("config/secrets/bitmex_api_key.txt") |> String.trim,
+      bitmex_api_secret: File.read!("config/secrets/bitmex_api_secret.txt") |> String.trim
 
   false ->
-    config :crypto,
+    config :cryptocurrency,
       # Kraken
       kraken_api_key: File.read!("config/secrets/kraken_api_key.txt") |> String.trim,
       kraken_api_secret: File.read!("config/secrets/kraken_api_secret.txt") |> String.trim,
@@ -50,5 +53,8 @@ case true do
       gemini_eth_wallet: File.read!("config/secrets/gemini_eth_wallet.txt") |> String.trim,
       # Bitfinex
       bitfinex_api_key: File.read!("config/secrets/bitfinex_api_key.txt") |> String.trim,
-      bitfinex_api_secret: File.read!("config/secrets/bitfinex_api_secret.txt") |> String.trim
+      bitfinex_api_secret: File.read!("config/secrets/bitfinex_api_secret.txt") |> String.trim,
+      # Bitmex
+      bitmex_api_key: File.read!("config/secrets/bitmex_api_key.txt") |> String.trim,
+      bitmex_api_secret: File.read!("config/secrets/bitmex_api_secret.txt") |> String.trim
 end

@@ -1,16 +1,7 @@
-defmodule Crypto.Pipeline.Quant do
+defmodule Cryptocurrency.Pipeline.Quant do
   @moduledoc false
 
-  import ShorterMaps
-  alias Crypto.Core.Order
-
-
-
-  ################################################################################
-  # Public API
-  ################################################################################
-
-  @max_coin_position 100
+  alias Cryptocurrency.Core.Order
 
 
 
@@ -37,7 +28,7 @@ defmodule Crypto.Pipeline.Quant do
       Keyword.fetch!(opts, :bid)
 
     volume =
-      min(buy_volume, sell_volume) |> min(@max_coin_position)
+      min(buy_volume, sell_volume)
 
     buy =
       %Order{
@@ -62,7 +53,8 @@ defmodule Crypto.Pipeline.Quant do
 
 
   @doc """
-  Given a list of `Order.t` compute the expected profit after exchange transaction fees apply.
+  Given a `:buy` and `:sell` of `Order.t` compute the expected profit after transaction and
+  withdrawal fees.
 
   """
   @spec arbitrage_profit(keyword) :: float

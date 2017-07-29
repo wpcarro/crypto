@@ -1,9 +1,9 @@
-defmodule Crypto.Pipeline.PoolTest do
+defmodule Cryptocurrency.Pipeline.PoolTest do
   use ExUnit.Case, async: true
 
   import ShorterMaps
-  alias Crypto.Pipeline.Pool
-  alias Crypto.Exchange.{GDAX, Gemini, Kraken, Poloniex, XBTCE}
+  alias Cryptocurrency.Pipeline.Pool
+  alias Cryptocurrency.Exchange.{GDAX, Gemini, Kraken, Poloniex, XBTCE}
 
   defmodule MockExchange do
     def __using__(opts \\ []) do

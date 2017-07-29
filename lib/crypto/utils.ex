@@ -1,4 +1,4 @@
-defmodule Crypto.Utils do
+defmodule Cryptocurrency.Utils do
   @moduledoc """
   Module hosting utility functions for common decoding tasks.
 

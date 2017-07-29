@@ -1,10 +1,10 @@
-defmodule Crypto.Exchange.Poloniex do
+defmodule Cryptocurrency.Exchange.Poloniex do
   @moduledoc """
-  Behaviour module implementing the `Crypto.Exchange` callbacks for Poloniex.
+  Behaviour module implementing the `Cryptocurrency.Exchange` callbacks for Poloniex.
 
   """
 
-  @behaviour Crypto.Exchange
+  @behaviour Cryptocurrency.Exchange
 
 
 

@@ -1,6 +1,6 @@
-defmodule Crypto.Exchange.GDAX do
+defmodule Cryptocurrency.Exchange.GDAX do
   @moduledoc """
-  Behaviour module implementing the `Crypto.Exchange` callbacks for GDAX.
+  Behaviour module implementing the `Cryptocurrency.Exchange` callbacks for GDAX.
 
   GDAX supports margin trading through its API meaning our algorithm can take both buy and sell
   sides of arbitrage opportunities.
@@ -41,12 +41,12 @@ defmodule Crypto.Exchange.GDAX do
 
   """
 
-  alias Crypto.Utils
-  alias Crypto.Core.OrderBook
-  alias Crypto.Exchange
-  alias Crypto.Exchange.GDAX.HTTP
+  alias Cryptocurrency.Utils
+  alias Cryptocurrency.Core.OrderBook
+  alias Cryptocurrency.Exchange
+  alias Cryptocurrency.Exchange.GDAX.HTTP
 
-  @behaviour Crypto.Exchange
+  @behaviour Cryptocurrency.Exchange
 
 
 
@@ -54,10 +54,10 @@ defmodule Crypto.Exchange.GDAX do
   # Constants
   ################################################################################
 
-  @coinbase_btc_wallet Application.get_env(:crypto, :coinbase_btc_wallet)
-  @coinbase_eth_wallet Application.get_env(:crypto, :coinbase_eth_wallet)
-  @coinbase_ltc_wallet Application.get_env(:crypto, :coinbase_ltc_wallet)
-  @coinbase_usd_wallet Application.get_env(:crypto, :coinbase_usd_wallet)
+  @coinbase_btc_wallet Application.get_env(:cryptocurrency, :coinbase_btc_wallet)
+  @coinbase_eth_wallet Application.get_env(:cryptocurrency, :coinbase_eth_wallet)
+  @coinbase_ltc_wallet Application.get_env(:cryptocurrency, :coinbase_ltc_wallet)
+  @coinbase_usd_wallet Application.get_env(:cryptocurrency, :coinbase_usd_wallet)
 
 
 

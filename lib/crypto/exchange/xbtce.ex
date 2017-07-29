@@ -1,12 +1,12 @@
-defmodule Crypto.Exchange.XBTCE do
+defmodule Cryptocurrency.Exchange.XBTCE do
   @moduledoc """
-  Behaviour module implementing the `Crypto.Exchange` callbacks for the xBTCe exchange.
+  Behaviour module implementing the `Cryptocurrency.Exchange` callbacks for the xBTCe exchange.
 
   """
 
-  alias Crypto.Exchange.XBTCE.HTTP
+  alias Cryptocurrency.Exchange.XBTCE.HTTP
 
-  @behaviour Crypto.Exchange
+  @behaviour Cryptocurrency.Exchange
 
 
 

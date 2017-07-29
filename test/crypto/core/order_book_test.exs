@@ -1,8 +1,8 @@
-defmodule Crypto.Core.OrderBookTest do
+defmodule Cryptocurrency.Core.OrderBookTest do
   use ExUnit.Case, async: true
 
   import ShorterMaps
-  alias Crypto.Core.OrderBook
+  alias Cryptocurrency.Core.OrderBook
 
   setup do
     book =

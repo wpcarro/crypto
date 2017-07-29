@@ -1,7 +1,8 @@
 defmodule Cryptocurrency.Pipeline.Quant do
   @moduledoc false
 
-  alias Cryptocurrency.Core.Order
+  import ShorterMaps
+  alias Cryptocurrency.Core.{Order, OrderBook}
 
 
 
@@ -10,12 +11,68 @@ defmodule Cryptocurrency.Pipeline.Quant do
   ################################################################################
 
   @doc """
-  Receives `:ask` and `:bid` information and creates both a buy and sell order that represents the
-  optimal acceptable action given the ask and bid data.
+  Receives a list of tuples representing buy and sell exchange pairings and returns the pair with
+  the largest profit opportunity.
 
-  Returns a tuple of `{buy, sell}` where both `buy` and `sell` are `Order.t`.
+  ## Options
+
+    * `:currency_pair` - `Exchange.asset_pair`. Required.
+
+    * `:reject_negative_profits` - `boolean`. Returns an empty list of none of the opportunities are
+      profitable. Defaults to true.
 
   """
+  @spec max_profit_for([{buy_exchange, sell_exchange}], %{exchange => OrderBook.t}, keyword) :: {buy, sell, profit} when
+        buy_exchange: module, sell_exchange: module, exchange: module,
+        buy: Order.t, sell: Order.t, profit: float
+  def max_profit_for(pairable_exchanges, exchange_to_orderbook, opts \\ []) do
+    currency_pair =
+      Keyword.fetch!(opts, :currency_pair)
+
+    reject_negative_profits? =
+      Keyword.get(opts, :reject_negative_profits, true)
+
+    rejection_predicate =
+      case reject_negative_profits? do
+        true  -> fn {_buy_order, _sell_order, profit} -> profit < 0.0 end
+        false -> fn _ -> false end
+      end
+
+    pairable_exchanges
+    |> Stream.map(fn {buy_exchange, sell_exchange} ->
+      ~M{ask} =
+        Map.fetch!(exchange_to_orderbook, buy_exchange)
+
+      ~M{bid} =
+        Map.fetch!(exchange_to_orderbook, sell_exchange)
+
+      ask =
+        %{price: ask.price, volume: ask.volume, exchange: buy_exchange}
+
+      bid =
+        %{price: bid.price, volume: bid.volume, exchange: sell_exchange}
+
+      {ask, bid}
+    end)
+    |> Stream.map(fn {ask, bid} ->
+      {buy_order, sell_order} =
+        orders_for(asset_pair: currency_pair, ask: ask, bid: bid)
+
+      profit =
+        arbitrage_profit(buy: buy_order, sell: sell_order)
+
+      {buy_order, sell_order, profit}
+    end)
+    |> Stream.reject(rejection_predicate)
+    |> Enum.max_by(fn {_buy_order, _sell_order, profit} -> profit end, fn -> nil end)
+  end
+
+
+
+  ################################################################################
+  # Private Helpers
+  ################################################################################
+
   @spec orders_for(keyword) :: {buy :: Order.t, sell :: Order.t}
   def orders_for(opts \\ []) do
     asset_pair =
@@ -52,13 +109,8 @@ defmodule Cryptocurrency.Pipeline.Quant do
   end
 
 
-  @doc """
-  Given a `:buy` and `:sell` of `Order.t` compute the expected profit after transaction and
-  withdrawal fees.
-
-  """
   @spec arbitrage_profit(keyword) :: float
-  def arbitrage_profit(opts \\ []) do
+  defp arbitrage_profit(opts \\ []) do
     %Order{
       side: :buy,
       exchange: buy_exchange,

@@ -84,7 +84,7 @@ defmodule Cryptocurrency.Pipeline.Maestro do
             key =
               Timex.now |> Timex.to_unix |> to_string
 
-            Storage.put(key, spread)
+            Storage.put(key, {buy.exchange, sell.exchange, spread})
 
           nil ->
             IO.puts("#{cycles_remaining} Holding...\n")
@@ -160,37 +160,12 @@ defmodule Cryptocurrency.Pipeline.Maestro do
 
     case pairable_exchanges do
       [] -> IO.inspect("No pairable exchanges")
-      _  -> :ok
+      _  -> IO.inspect(pairable_exchanges)
     end
 
     result =
-      pairable_exchanges
-      |> Stream.map(fn {buy_exchange, sell_exchange} ->
-        ~M{ask} =
-          Map.fetch!(exchange_to_orderbook, buy_exchange)
-
-        ~M{bid} =
-          Map.fetch!(exchange_to_orderbook, sell_exchange)
-
-        ask =
-          %{price: ask.price, volume: ask.volume, exchange: buy_exchange}
-
-        bid =
-          %{price: bid.price, volume: bid.volume, exchange: sell_exchange}
-
-        {ask, bid}
-      end)
-      |> Stream.map(fn {ask, bid} ->
-        {buy_order, sell_order} =
-          Quant.orders_for(asset_pair: @currency_pair, ask: ask, bid: bid)
-
-        profit =
-          Quant.arbitrage_profit(buy: buy_order, sell: sell_order)
-
-        {buy_order, sell_order, profit}
-      end)
-      # |> Stream.reject(fn {_buy_order, _sell_order, profit} -> profit < 0.0 end)
-      |> Enum.max_by(fn {_buy_order, _sell_order, profit} -> profit end, fn -> nil end)
+      Quant.max_profit_for(pairable_exchanges, exchange_to_orderbook,
+        currency_pair: @currency_pair, reject_negative_profits: false)
 
     {:reply, result, state}
   end

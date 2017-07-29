@@ -12,6 +12,7 @@ defmodule Cryptocurrency.Pipeline.Maestro do
   alias __MODULE__
   alias Cryptocurrency.Exchange.{GDAX, Bitfinex}
   alias Cryptocurrency.Pipeline.{Matchmaker, Quant}
+  alias Cryptocurrency.Core.Storage
 
   @cycle_interval 2_000
   @cycle_count 10
@@ -79,6 +80,11 @@ defmodule Cryptocurrency.Pipeline.Maestro do
             print_fn.("\tSpread: $#{spread}")
             print_fn.("\tProfit: $#{profit}")
             print_fn.("\tROI: #{roi * 100}%\n")
+
+            key =
+              Timex.now |> Timex.to_unix |> to_string
+
+            Storage.put(key, spread)
 
           nil ->
             IO.puts("#{cycles_remaining} Holding...\n")

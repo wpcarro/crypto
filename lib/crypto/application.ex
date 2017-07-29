@@ -5,6 +5,7 @@ defmodule Cryptocurrency.Application do
 
   use Application
   alias Cryptocurrency.Pipeline.Maestro
+  alias Cryptocurrency.Core.Storage
 
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
@@ -14,6 +15,7 @@ defmodule Cryptocurrency.Application do
       # Starts a worker by calling: Cryptocurrency.Worker.start_link(arg1, arg2, arg3)
       # worker(Cryptocurrency.Worker, [arg1, arg2, arg3]),
       worker(Maestro, []),
+      worker(Storage, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

@@ -36,6 +36,7 @@ defmodule Cryptocurrency.Mixfile do
       {:poison, "~> 3.1"},
       {:shorter_maps, "~> 2.1"},
       {:cortex, "~> 0.1", only: [:dev, :test]},
+      {:rox, "~> 1.2"},
     ]
   end
 end

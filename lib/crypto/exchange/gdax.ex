@@ -46,7 +46,7 @@ defmodule Cryptocurrency.Exchange.GDAX do
   alias Cryptocurrency.Exchange
   alias Cryptocurrency.Exchange.GDAX.HTTP
 
-  @behaviour Cryptocurrency.Exchange
+  @behaviour Exchange
 
 
 
@@ -65,6 +65,7 @@ defmodule Cryptocurrency.Exchange.GDAX do
   # Callback Definitions
   ################################################################################
 
+  @impl Exchange
   def fetch_order_book(asset_pair) do
     endpoint =
       "/products/#{product_id(asset_pair)}/book"
@@ -79,6 +80,7 @@ defmodule Cryptocurrency.Exchange.GDAX do
   end
 
 
+  @impl Exchange
   def transaction_fee(:eth_usd),
     do: 0.003
 
@@ -89,43 +91,52 @@ defmodule Cryptocurrency.Exchange.GDAX do
     do: 0.003
 
 
+  @impl Exchange
   def withdrawal_fee(_asset_pair),
-    do: 0.0
+    do: raise("Not impld")
 
 
-  def execute_orders(_orders),
-    do: :ok
+  @impl Exchange
+  def margin_funding_fee(_asset_pair),
+    do: raise("Not impld")
 
 
+  @impl Exchange
   def supported_assets,
     do: MapSet.new([:eth, :btc, :ltc, :usd, :eur, :gbp])
 
 
+  @impl Exchange
   def supported_sides,
     do: MapSet.new([:buy, :sell])
 
 
-  def sell(opts),
-    do: execute_order(:sell, opts)
-
-
+  @impl Exchange
   def buy(opts),
     do: execute_order(:buy, opts)
 
 
-  def orders do
-    HTTP.get!("/orders", decode: true)
-  end
+  @impl Exchange
+  def sell(opts),
+    do: execute_order(:sell, opts)
 
 
+  @impl Exchange
   def cancel(order_id) do
     HTTP.delete!("/orders/#{order_id}", decode: true)
   end
 
 
+  @impl Exchange
+  def pending_orders do
+    HTTP.get!("/orders", decode: true)
+  end
+
+
+  @impl Exchange
   def send_to_exchange(opts) do
     asset =
-      Keyword.fetch!(opts, :asset) |> to_string
+      Keyword.fetch!(opts, :asset)
 
     volume =
       Keyword.fetch!(opts, :volume)
@@ -138,7 +149,7 @@ defmodule Cryptocurrency.Exchange.GDAX do
 
     body = %{
       amount: volume,
-      currency: asset,
+      currency: asset |> to_string(),
       crypto_address: address,
     }
 
@@ -146,6 +157,7 @@ defmodule Cryptocurrency.Exchange.GDAX do
   end
 
 
+  @impl Exchange
   def wallet_address(:eth), do: @coinbase_eth_wallet
   def wallet_address(:btc), do: @coinbase_btc_wallet
   def wallet_address(:ltc), do: @coinbase_ltc_wallet

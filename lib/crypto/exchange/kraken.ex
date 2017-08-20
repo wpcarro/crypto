@@ -7,8 +7,9 @@ defmodule Cryptocurrency.Exchange.Kraken do
   alias Cryptocurrency.Utils
   alias Cryptocurrency.Core.OrderBook
   alias Cryptocurrency.Exchange.Kraken.HTTP
+  alias Cryptocurrency.Exchange
 
-  @behaviour Cryptocurrency.Exchange
+  @behaviour Exchange
 
 
 
@@ -16,6 +17,7 @@ defmodule Cryptocurrency.Exchange.Kraken do
   # Callback Definitions
   ################################################################################
 
+  @impl Exchange
   def fetch_order_book(asset_pair) do
     asset_pair =
       to_asset_pair(asset_pair)
@@ -33,24 +35,59 @@ defmodule Cryptocurrency.Exchange.Kraken do
   end
 
 
+  @impl Exchange
   def transaction_fee(_),
     do: 0.0026
 
 
+  @impl Exchange
   def withdrawal_fee(_),
     do: 0.0
 
 
-  def execute_orders(_orders),
-    do: :ok
+  @impl Exchange
+  def margin_funding_fee(_asset),
+    do: raise("Not implemented")
 
 
+  @impl Exchange
   def supported_assets,
     do: raise("Not implemented")
 
 
+  @impl Exchange
   def supported_sides,
     do: MapSet.new([:buy, :sell])
+
+
+  @impl Exchange
+  def buy(_opts),
+    do: raise("Not implemented")
+
+
+  @impl Exchange
+  def sell(_opts),
+    do: raise("Not implemented")
+
+
+  @impl Exchange
+  def cancel(_opts),
+    do: raise("Not implemented")
+
+
+  @impl Exchange
+  def pending_orders(),
+    do: raise("Not implemented")
+
+
+  @impl Exchange
+  def send_to_exchange(_opts),
+    do: raise("Not implemented")
+
+
+  @impl Exchange
+  def wallet_address(_asset),
+    do: raise("Not implemented")
 
 
 

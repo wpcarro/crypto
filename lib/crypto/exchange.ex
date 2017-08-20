@@ -64,8 +64,49 @@ defmodule Cryptocurrency.Exchange do
   These values are used in the match-making algorithm, which pairs exchanges based on compatible
   buying and selling capabilities.
 
+  ## Example
+
+  If `SomeExchange.supported_sides() # => [:buy, :sell]` that indicates the `SomeExchange` permits
+  buying (non-margin) and selling (margin).
+
+  If `AnotherExchange.supported_sides() # => [:buy]` that indicates the `AnotherExchange` permits
+  buying (non-margin) but does not support margin selling. Therefore `AnotherExchange` can only be
+  used on the buy-side of the arbitrage strategy.
+
   """
   @callback supported_sides :: MapSet.t(Order.side)
+
+
+  @doc """
+  Buys a specified amount of an asset. This purchase is not on margin.
+
+  """
+  @callback buy(opts :: keyword) :: :ok | {:error, reason :: any}
+
+
+  @doc """
+  Sells a specified amount of an assert on margin.
+
+  """
+  @callback sell(opts :: keyword) :: :ok | {:error, reason :: any}
+
+
+  @doc """
+  Cancels an open order.
+
+  """
+  @callback cancel(opts :: keyword) :: :ok | {:error, reason :: any}
+
+
+  @doc """
+  Returns the outstanding, open orders -- both `:buy` and `:sell` -- for the exchange.
+
+  Usually a coordinator, like the `Maestro`, will have a record in its state for items like this. It
+  is possible (even though it ought not be) for the application's state to diverge from reality.
+  This function is intended to be used to sync the application state with the exchange's state.
+
+  """
+  @callback pending_orders() :: :ok | {:error, reason :: any}
 
 
   @doc """

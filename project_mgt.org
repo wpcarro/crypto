@@ -12,15 +12,25 @@
   * deposit:      bank -> account
   * withdraw:     account -> bank
 * DONE integrate Coinbase wallet with GDAX exchange
-* TODO classify exchanges that support buy and sell sides
-* TODO ensure HTTPoison starts automatically
-* TODO ensure Maestro starts automatically
+* DONE wire up Rocks DB to collect spread data
+* DONE ensure HTTPoison starts automatically
+* DONE ensure Maestro starts automatically
+* TODO integrate StatsD using Statix Elixir client
+* TODO record buy data for each exchange (increment "gdax.buy")
+* TODO record sell data for each exchange (increment "gdax.sell")
+* TODO record failed arbitrage opportunities (ie caught holding one side of the arbitrage)
+* TODO record "no pairable exchanges" event (increment "no_pairable_exchanges")
+* TODO record exchange timeout events (increment "gdax.fetch_orderbook_timeout")
+* TODO use buy and sell sides in matchmaking algorithm
 * TODO respond to status code 429 and implement back off
 * TODO implement high fidelity timing
+* TODO implement logic to manage failed arbitrage sides (eg caught only satisying sell or buy side)
 * TODO host on Amazon EC2 instance
 * TODO hook in twilio alerts for profits greater than $5
 * TODO integrate Gemini wallet with exchange
 * TODO integrate Kraken wallet with exchange
+* TODO impl socket feed for GDAX
+* TODO impl socket feed for Bitfinex
 * Administration
 * TODO determine if we should withdraw profits from accounts (and incur fee) or keep profits around to make future buys
 * TODO register margin account on GDAX

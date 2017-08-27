@@ -46,15 +46,15 @@ defmodule Cryptocurrency.Pipeline.Quant do
       ~M{bid} =
         Map.fetch!(exchange_to_orderbook, sell_exchange)
 
-      ask =
-        %{price: ask.price, volume: ask.volume, exchange: buy_exchange}
+      # {bid, ask} =
+      #   {hd(bids), hd(asks)}
 
-      bid =
-        %{price: bid.price, volume: bid.volume, exchange: sell_exchange}
+      # ask =
+      #   %{price: ask.price, volume: ask.volume, exchange: buy_exchange}
 
-      {ask, bid}
-    end)
-    |> Stream.map(fn {ask, bid} ->
+      # bid =
+      #   %{price: bid.price, volume: bid.volume, exchange: sell_exchange}
+
       {buy_order, sell_order} =
         orders_for(asset_pair: currency_pair, ask: ask, bid: bid)
 
@@ -68,49 +68,31 @@ defmodule Cryptocurrency.Pipeline.Quant do
   end
 
 
+  @doc """
+  Computes the realizable profit for a particular arbitrage opportunity.
 
-  ################################################################################
-  # Private Helpers
-  ################################################################################
+  The arbitrage profit depends on a series of fees that vary between each exchange and depend on the
+  arbitrage strategy.
 
-  @spec orders_for(keyword) :: {buy :: Order.t, sell :: Order.t}
-  def orders_for(opts \\ []) do
-    asset_pair =
-      Keyword.fetch!(opts, :asset_pair)
+  ## Fees
 
-    %{price: buy_price, volume: buy_volume, exchange: buy_exchange} =
-      Keyword.fetch!(opts, :ask)
+    * Exchange transaction fees, which are a function of the `:asset_pair` being transacted.
 
-    %{price: sell_price, volume: sell_volume, exchange: sell_exchange} =
-      Keyword.fetch!(opts, :bid)
+    * Exchange withdrawal fees, which may vary for different `:asset_pair`.
 
-    volume =
-      min(buy_volume, sell_volume)
+  ## Fees (Not Implemented)
 
-    buy =
-      %Order{
-        side: :buy,
-        exchange: buy_exchange,
-        price: buy_price,
-        volume: volume,
-        asset_pair: asset_pair,
-      }
+    * Exchange margin trading fees (if applicable).
 
-    sell =
-      %Order{
-        side: :sell,
-        exchange: sell_exchange,
-        price: sell_price,
-        volume: volume,
-        asset_pair: asset_pair,
-      }
+  ## Options
 
-    {buy, sell}
-  end
+    * `:buy` - `Order.t`. The buy order.
 
+    * `:sell` - `Order.t`. The sell order.
 
+  """
   @spec arbitrage_profit(keyword) :: float
-  defp arbitrage_profit(opts \\ []) do
+  def arbitrage_profit(opts \\ []) do
     %Order{
       side: :buy,
       exchange: buy_exchange,
@@ -145,6 +127,63 @@ defmodule Cryptocurrency.Pipeline.Quant do
       sell_price * sell_volume * (1 - sell_tx_fee)
 
     to_sell - to_buy
+  end
+
+
+  @doc """
+  Creates orders for a particular `:bid` and `:ask`.
+
+  ## Options
+
+    * `:bid` - `map`. Contains `:price`, `:volume`, and `:exchange` data about the buy order.
+
+    * `:ask` - `map`. Contains `:price`, `:volume`, and `:exchange` data about the sell order.
+
+    * `:asset_pair` - `Exchange.asset_pair`. An atom denoting the bid and sell assets for the
+      desired order.
+
+    * `:max_volume` - `float`. The maximum volume allowed regardless of the opportunity size.
+
+  """
+  @spec orders_for(keyword) :: {buy :: map, sell :: map}
+  def orders_for(opts \\ []) do
+    asset_pair =
+      Keyword.fetch!(opts, :asset_pair)
+
+    %{price: buy_price, volume: buy_volume, exchange: buy_exchange} =
+      Keyword.fetch!(opts, :ask)
+
+    %{price: sell_price, volume: sell_volume, exchange: sell_exchange} =
+      Keyword.fetch!(opts, :bid)
+
+    max_volume =
+      Keyword.get(opts, :max_volume, :no_limit)
+
+    volume =
+      case max_volume do
+        :no_limit -> min(buy_volume, sell_volume)
+        limit     -> min(buy_volume, sell_volume) |> min(limit)
+      end
+
+    buy =
+      %Order{
+        side: :buy,
+        exchange: buy_exchange,
+        price: buy_price,
+        volume: volume,
+        asset_pair: asset_pair,
+      }
+
+    sell =
+      %Order{
+        side: :sell,
+        exchange: sell_exchange,
+        price: sell_price,
+        volume: volume,
+        asset_pair: asset_pair,
+      }
+
+    {buy, sell}
   end
 
 end

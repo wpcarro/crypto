@@ -23,6 +23,7 @@ defmodule Cryptocurrency.Core.Order do
   }
 
 
+  @enforce_keys [:side, :price, :volume, :exchange, :asset_pair]
   defstruct [
     side: nil,
     price: nil,

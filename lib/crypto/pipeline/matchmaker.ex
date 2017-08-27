@@ -19,6 +19,9 @@ defmodule Cryptocurrency.Pipeline.Matchmaker do
   classified as buy-only or sell-only or buy-and-sell. Because of this, we need to compute a list at
   compile-time that contains only compatible exchange pairs.
 
+  A future rendition of this function may support a pairing algorithm that accounts for the
+  currencies that each exchange supports as well. For now this is manually managed.
+
   """
   @spec pairable_exchanges([exchange]) :: [{buy_exchange, sell_exchange}] when
         exchange: module,

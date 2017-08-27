@@ -15,6 +15,9 @@
 * DONE wire up Rocks DB to collect spread data
 * DONE ensure HTTPoison starts automatically
 * DONE ensure Maestro starts automatically
+* TODO add @docs to public functions
+* TODO add @specs to functions
+* TODO add Dialyzer support
 * TODO integrate StatsD using Statix Elixir client
 * TODO record buy data for each exchange (increment "gdax.buy")
 * TODO record sell data for each exchange (increment "gdax.sell")
@@ -31,6 +34,9 @@
 * TODO integrate Kraken wallet with exchange
 * TODO impl socket feed for GDAX
 * TODO impl socket feed for Bitfinex
+* TODO model asset_pairs as tuples
+* TODO create __using__ macro for DSL impling Exchange modules
+* TODO upgrade application to Elixir 1.5
 * Administration
 * TODO determine if we should withdraw profits from accounts (and incur fee) or keep profits around to make future buys
 * TODO register margin account on GDAX

@@ -52,7 +52,7 @@ defmodule Cryptocurrency.Exchange.Kraken do
 
   @impl Exchange
   def supported_assets,
-    do: raise("Not implemented")
+    do: MapSet.new([:eth, :btc, :usd])
 
 
   @impl Exchange

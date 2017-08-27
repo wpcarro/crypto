@@ -93,7 +93,7 @@ defmodule Cryptocurrency.Exchange.GDAX do
 
   @impl Exchange
   def withdrawal_fee(_asset_pair),
-    do: raise("Not impld")
+    do: 0.0
 
 
   @impl Exchange

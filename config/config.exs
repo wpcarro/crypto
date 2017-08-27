@@ -39,7 +39,7 @@ production_config = Keyword.merge(shared_config, [
 ])
 
 
-sandbox? = false
+sandbox? = true
 
 case sandbox? do
   true  -> config :cryptocurrency, sandbox_config

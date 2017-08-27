@@ -125,4 +125,69 @@ defmodule Cryptocurrency.Exchange do
   """
   @callback wallet_address(asset) :: binary
 
+
+
+  ################################################################################
+  # Public Macros
+  ################################################################################
+
+  defmacro __using__(opts \\ []) do
+    nulary_functions =
+      [{:supported_assets, []},
+       {:supported_sides, []},
+      ]
+
+    unary_functions =
+      [{:transaction_fee, 0.0},
+       {:withdrawal_fee, 0.0},
+       {:margin_funding_fee, 0.0},
+      ]
+
+    nulary_function_defns =
+      for {function_name, default} <- nulary_functions do
+        case Keyword.get(opts, function_name) do
+          nil ->
+            case default do
+              vals when is_list(vals) ->
+                quote do
+                  def unquote(function_name)(), do: MapSet.new(unquote(default))
+                end
+
+              _ ->
+              quote do
+                def unquote(function_name)(), do: unquote(default)
+              end
+            end
+
+          vals when is_list(vals) ->
+            quote do
+              def unquote(function_name)(), do: MapSet.new(unquote(vals))
+            end
+        end
+      end
+
+    unary_function_defns =
+      for {function_name, default} <- unary_functions do
+        case Keyword.get(opts, function_name) do
+          nil ->
+            quote do
+              def unquote(function_name)(_), do: unquote(default)
+            end
+
+          [{_k, _v} | _rest] = keyword ->
+            for {asset_pair, amt} <- keyword do
+              quote do
+                def unquote(function_name)(unquote(asset_pair)), do: unquote(amt)
+              end
+            end
+        end
+      end
+
+    quote do
+      unquote(unary_function_defns)
+      unquote(nulary_function_defns)
+    end
+  end
+
+
 end

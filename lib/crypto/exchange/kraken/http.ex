@@ -25,6 +25,10 @@ defmodule Cryptocurrency.Exchange.Kraken.HTTP do
   Fetches data from Kraken's public API. Forwards `headers` and `opts` to the `HTTPoison.get!/3`
   function.
 
+  ## Options
+
+    * `:decode` - Specifies whether or not to attempt to decode the response. Defaults to `false`.
+
   """
   @spec public_get(Path.t, keyword) :: HTTPoison.Response.t
   def public_get(endpoint, opts \\ []) do

@@ -2,6 +2,9 @@ defmodule Cryptocurrency.Exchange do
   @moduledoc """
   Module defining the Exchange `behaviour` callbacks for children modules.
 
+  Exchanges are behaviours, which allow consumers to assert on API shape. Exchanges are also Agents,
+  which allows them to cache various data like account balances.
+
   """
 
   alias Cryptocurrency.Core.{Order, OrderBook}
@@ -22,10 +25,21 @@ defmodule Cryptocurrency.Exchange do
   ################################################################################
 
   @doc """
+  Starts the Exchange as a stateful process.
+
+  ## Options
+
+    * `:http_driver` - `module`. Injectable HTTP driver. Used to mocking in tests.
+
+  """
+  @callback start_link(keyword) :: Agent.on_start
+
+
+  @doc """
   Makes an HTTP request to get the order book for a specified `asset_pair`.
 
   """
-  @callback fetch_order_book(asset_pair) :: OrderBook.t
+  @callback fetch_order_book(asset_pair) :: {:ok, OrderBook.t} | {:error, reason :: any}
 
 
   @doc """

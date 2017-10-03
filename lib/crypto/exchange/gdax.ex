@@ -41,11 +41,13 @@ defmodule Cryptocurrency.Exchange.GDAX do
 
   """
 
+  import ShorterMaps
   alias Cryptocurrency.Utils
   alias Cryptocurrency.Core.OrderBook
   alias Cryptocurrency.Exchange
-  alias Cryptocurrency.Exchange.GDAX.HTTP
+  alias __MODULE__
 
+  use Agent
   @behaviour Exchange
 
 
@@ -54,9 +56,7 @@ defmodule Cryptocurrency.Exchange.GDAX do
   # Constants
   ################################################################################
 
-  @coinbase_btc_wallet Application.get_env(:cryptocurrency, :coinbase_btc_wallet)
   @coinbase_eth_wallet Application.get_env(:cryptocurrency, :coinbase_eth_wallet)
-  @coinbase_ltc_wallet Application.get_env(:cryptocurrency, :coinbase_ltc_wallet)
   @coinbase_usd_wallet Application.get_env(:cryptocurrency, :coinbase_usd_wallet)
 
 
@@ -66,6 +66,21 @@ defmodule Cryptocurrency.Exchange.GDAX do
   ################################################################################
 
   @impl Exchange
+  def start_link(opts \\ []) do
+    balance =
+      %{usd: 0.00, eth: 0.00}
+
+    http_driver =
+      Keyword.get(opts, :http_driver, GDAX.HTTP)
+
+    state =
+      ~M{balance, http_driver}
+
+    Agent.start_link(fn -> state end, name: __MODULE__)
+  end
+
+
+  @impl Exchange
   def fetch_order_book(asset_pair) do
     endpoint =
       "/products/#{product_id(asset_pair)}/book"
@@ -73,9 +88,12 @@ defmodule Cryptocurrency.Exchange.GDAX do
     params =
       [level: 2]
 
-    case HTTP.get!(endpoint, params: params) do
-      %HTTPoison.Response{body: body} ->
-        Poison.decode!(body) |> order_book_from_raw
+    driver =
+      Agent.get(__MODULE__, fn ~M{driver} -> driver end)
+
+    with {:ok, ~M{body}}   <- apply(driver, :get, [endpoint, params: params]),
+         {:ok, order_book} <- order_book_from_raw(body) do
+      {:ok, order_book}
     end
   end
 
@@ -175,10 +193,10 @@ defmodule Cryptocurrency.Exchange.GDAX do
   defp product_id(:btc_usd), do: "BTC-USD"
 
 
-  @spec order_book_from_raw(map) :: OrderBook.t
-  defp order_book_from_raw(raw) do
+  @spec order_book_from_raw(iodata) :: {:ok, OrderBook.t} | {:error, :decode_error}
+  defp order_book_from_raw(body) do
     %{"asks" => asks, "bids" => bids} =
-      raw
+      Poison.decode!(body)
 
     decode_entry = fn
       [price, size, order_count] ->
@@ -188,7 +206,14 @@ defmodule Cryptocurrency.Exchange.GDAX do
          }
     end
 
-    struct(OrderBook, asks: Enum.map(asks, decode_entry), bids: Enum.map(bids, decode_entry))
+    struct!(OrderBook, asks: Enum.map(asks, decode_entry), bids: Enum.map(bids, decode_entry))
+  rescue
+    _ -> {:error, :decode_error}
+  end
+
+
+  @spec do_order_book_from_raw(map) :: {:ok, }
+  defp do_order_book_from_raw(decoded) do
   end
 
 

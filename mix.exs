@@ -4,7 +4,7 @@ defmodule Cryptocurrency.Mixfile do
   def project do
     [app: :cryptocurrency,
      version: "0.1.0",
-     elixir: "~> 1.4",
+     elixir: "~> 1.5.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
@@ -15,8 +15,7 @@ defmodule Cryptocurrency.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
-    [extra_applications: [:logger],
-     applications: [:httpoison],
+    [extra_applications: [:sasl, :logger],
      mod: {Cryptocurrency.Application, []}]
   end
 
@@ -37,6 +36,7 @@ defmodule Cryptocurrency.Mixfile do
       {:shorter_maps, "~> 2.1"},
       {:cortex, "~> 0.1", only: [:dev, :test]},
       {:rox, "~> 1.2"},
+      {:extra, github: "urbint/extra"}
     ]
   end
 end

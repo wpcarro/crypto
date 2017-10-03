@@ -1,5 +1,8 @@
 use Mix.Config
 
+config :logger,
+  handle_sasl_reports: true
+
 shared_config = [
   # Kraken
   kraken_api_key: File.read!("config/secrets/kraken_api_key.txt") |> String.trim,

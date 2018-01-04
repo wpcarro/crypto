@@ -35,7 +35,7 @@ defmodule Cryptocurrency.Pipeline.Maestro do
   @supported_exchanges [GDAX, Bitfinex, Kraken]
   @pairable_exchanges Matchmaker.pairable_exchanges(@supported_exchanges)
   @cycle_interval 2_000
-  @cycle_count 10
+  @default_cycle_count 10
 
 
 
@@ -54,8 +54,24 @@ defmodule Cryptocurrency.Pipeline.Maestro do
   exhausted.
 
   """
-  @spec rinse_repeat(non_neg_integer) :: :ok
-  def rinse_repeat(cycle_count \\ @cycle_count)
+  @spec rinse_repeat(non_neg_integer | :infinite) :: :ok
+  def rinse_repeat(cycle_count \\ @default_cycle_count)
+
+  def rinse_repeat(:infinite) do
+    t0 =
+      Timex.now |> Timex.to_unix
+
+    :ok = do_rinse_repeat()
+
+    t1 =
+      Timex.now |> Timex.to_unix
+
+    sleep_time =
+      @cycle_interval - (t1 - t0)
+
+    Process.sleep(sleep_time)
+    Maestro.rinse_repeat(:infinite)
+  end
 
   def rinse_repeat(0),
     do: :ok
@@ -64,6 +80,21 @@ defmodule Cryptocurrency.Pipeline.Maestro do
     t0 =
       Timex.now |> Timex.to_unix
 
+    :ok = do_rinse_repeat(cycle_count)
+
+    t1 =
+      Timex.now |> Timex.to_unix
+
+    sleep_time =
+      @cycle_interval - (t1 - t0)
+
+    Process.sleep(sleep_time)
+    Maestro.rinse_repeat(cycle_count - 1)
+  end
+
+
+  @spec do_rinse_repeat(non_neg_integer) :: :ok
+  defp do_rinse_repeat(cycle_count \\ 1) do
     task =
       Task.async(&find_arbitrage_opportunity/0)
 
@@ -103,15 +134,6 @@ defmodule Cryptocurrency.Pipeline.Maestro do
         IO.inspect("Failed to get a result this cycle.")
         nil
     end
-
-    t1 =
-      Timex.now |> Timex.to_unix
-
-    sleep_time =
-      @cycle_interval - (t1 - t0)
-
-    Process.sleep(sleep_time)
-    Maestro.rinse_repeat(cycle_count - 1)
   end
 
 

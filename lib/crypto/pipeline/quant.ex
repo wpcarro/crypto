@@ -46,14 +46,19 @@ defmodule Cryptocurrency.Pipeline.Quant do
       ~M{bid} =
         Map.fetch!(exchange_to_orderbook, sell_exchange)
 
-      # {bid, ask} =
-      #   {hd(bids), hd(asks)}
+      {ask, bid, buy_exchange, sell_exchange}
+    end)
+    |> Stream.reject(fn
+      {nil, _bid, _buy, _sell} -> true
+      {_ask, nil, _buy, _sell} -> true
+      _otherwise               -> false
+    end)
+    |> Stream.map(fn {ask, bid, buy_exchange, sell_exchange} ->
+      ask =
+        %{price: ask.price, volume: ask.volume, exchange: buy_exchange}
 
-      # ask =
-      #   %{price: ask.price, volume: ask.volume, exchange: buy_exchange}
-
-      # bid =
-      #   %{price: bid.price, volume: bid.volume, exchange: sell_exchange}
+      bid =
+        %{price: bid.price, volume: bid.volume, exchange: sell_exchange}
 
       {buy_order, sell_order} =
         orders_for(asset_pair: currency_pair, ask: ask, bid: bid)

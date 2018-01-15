@@ -125,10 +125,8 @@ defmodule Cryptocurrency.Exchange.Bithumb do
 
     decode_entry = fn
       ~m{quantity, price} ->
-        %Entry{
-          price: Utils.parse_float(price) * exchange_rate,
-          volume: Utils.parse_float(quantity),
-         }
+        %{price: Utils.parse_float(price) * exchange_rate,
+          volume: Utils.parse_float(quantity)}
     end
 
     struct(

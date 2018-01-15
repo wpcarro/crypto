@@ -18,6 +18,7 @@ defmodule Cryptocurrency.Application do
       # worker(Cryptocurrency.Worker, [arg1, arg2, arg3]),
       worker(Maestro, []),
       worker(Storage, []),
+      worker(Cryptocurrency.Forex, [:ok]),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

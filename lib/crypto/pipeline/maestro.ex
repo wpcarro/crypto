@@ -11,7 +11,7 @@ defmodule Cryptocurrency.Pipeline.Maestro do
   import ShorterMaps
   alias __MODULE__
   alias Cryptocurrency.Statsd
-  alias Cryptocurrency.Exchange.{GDAX, Bitfinex, Kraken}
+  alias Cryptocurrency.Exchange.{GDAX, Bitfinex, Bithumb, Kraken}
   alias Cryptocurrency.Pipeline.{Matchmaker, Quant}
 
 
@@ -33,7 +33,7 @@ defmodule Cryptocurrency.Pipeline.Maestro do
   ################################################################################
 
   @currency_pair :eth_usd
-  @supported_exchanges [GDAX, Bitfinex, Kraken]
+  @supported_exchanges [GDAX, Bitfinex, Bithumb, Kraken]
   @pairable_exchanges Matchmaker.pairable_exchanges(@supported_exchanges)
   @cycle_interval 2_000
   @default_cycle_count 10

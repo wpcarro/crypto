@@ -10,6 +10,7 @@ defmodule Cryptocurrency.Pipeline.Maestro do
 
   import ShorterMaps
   alias __MODULE__
+  alias Cryptocurrency.Statsd
   alias Cryptocurrency.Exchange.{GDAX, Bitfinex, Kraken}
   alias Cryptocurrency.Pipeline.{Matchmaker, Quant}
 
@@ -102,6 +103,7 @@ defmodule Cryptocurrency.Pipeline.Maestro do
       {:ok, result} ->
         case result do
           {buy, sell, profit} ->
+            do_record_rinse_repeat_stats(buy, sell, profit)
             spread =
               sell.price - buy.price
 
@@ -136,6 +138,27 @@ defmodule Cryptocurrency.Pipeline.Maestro do
     end
   end
 
+  @spec do_record_rinse_repeat_stats(buy, sell, profit) :: :ok
+  defp do_record_rinse_repeat_stats(buy, sell, profit) do
+    buy_exchange =
+      stringify_exchange(buy.exchange)
+    sell_exchange =
+      stringify_exchange(sell.exchange)
+
+    Statsd.increment("maestro.cycles")
+    Statsd.gauge("maestro.buy.#{buy_exchange}.price", buy.price)
+    Statsd.gauge("maestro.buy.#{buy_exchange}.volume", buy.volume)
+    Statsd.gauge("maestro.sell.#{sell_exchange}.price", sell.price)
+    Statsd.gauge("maestro.sell.#{sell_exchange}.volume", sell.volume)
+    Statsd.gauge("maestro.spread.#{buy_exchange}.#{sell_exchange}", sell.price - buy.price)
+    Statsd.increment("maestro.profit", profit)
+
+    {buy_total, sell_total} =
+      {buy.price * buy.volume, sell.price * sell.volume}
+    Statsd.gauge("maestro.roi", profit / (buy_total + sell_total) |> Float.round(4))
+
+    :ok
+  end
 
   @doc """
   Finds the maximum profit opportunity for all pairable exchanges.
@@ -182,7 +205,6 @@ defmodule Cryptocurrency.Pipeline.Maestro do
           nil
 
         _ ->
-          IO.inspect(pairable_exchanges)
           Quant.max_profit_for(pairable_exchanges, exchange_to_orderbook,
             currency_pair: @currency_pair, reject_negative_profits: false)
       end
@@ -243,8 +265,13 @@ defmodule Cryptocurrency.Pipeline.Maestro do
     t0 =
       Timex.now |> Timex.to_unix
 
+    exchange_name =
+      stringify_exchange(exchange)
+
     result =
-      apply(exchange, :fetch_order_book, [@currency_pair])
+      Statsd.measure("maestro.orderbook_fetch.#{exchange_name}", fn ->
+        apply(exchange, :fetch_order_book, [@currency_pair])
+      end)
 
     t1 =
       Timex.now |> Timex.to_unix
@@ -260,9 +287,14 @@ defmodule Cryptocurrency.Pipeline.Maestro do
             rtt: t1 - t0,
           }
 
+        Statsd.gauge("maestro.orderbook.bid.#{exchange_name}", value[:bid][:price])
+        Statsd.gauge("maestro.orderbook.ask.#{exchange_name}", value[:ask][:price])
+
         {:ok, {key, value}}
 
-      _ -> {:error, :fetch_fail}
+      _ ->
+        Statsd.increment("maestro.orderbook_fetch.#{stringify_exchange(exchange)}.fail")
+        {:error, :fetch_fail}
     end
   end
 

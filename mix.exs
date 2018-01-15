@@ -31,7 +31,7 @@ defmodule Cryptocurrency.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "~> 0.12.0", manager: :rebar},
+      {:httpoison, "~> 1.0", manager: :rebar},
       {:timex, "~> 3.1"},
       {:poison, "~> 3.1"},
       {:shorter_maps, "~> 2.1"},

@@ -24,6 +24,8 @@ shared_config = [
   bithumb_url: "https://api.bithumb.com",
   bithumb_api_key: File.read!("config/secrets/bithumb_api_key.txt") |> String.trim,
   bithumb_api_secret: File.read!("config/secrets/bithumb_api_secret.txt") |> String.trim
+  # CurrencyLayer
+  currency_layer_access_key: File.read!("config/secrets/currency_layer_access_key.txt") |> String.trim,
 ]
 
 sandbox_config = Keyword.merge(shared_config, [

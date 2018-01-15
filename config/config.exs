@@ -19,7 +19,11 @@ shared_config = [
   bitfinex_api_secret: File.read!("config/secrets/bitfinex_api_secret.txt") |> String.trim,
   # Bitmex
   bitmex_api_key: File.read!("config/secrets/bitmex_api_key.txt") |> String.trim,
-  bitmex_api_secret: File.read!("config/secrets/bitmex_api_secret.txt") |> String.trim
+  bitmex_api_secret: File.read!("config/secrets/bitmex_api_secret.txt") |> String.trim,
+  # BitHumb
+  bithumb_url: "https://api.bithumb.com",
+  bithumb_api_key: File.read!("config/secrets/bithumb_api_key.txt") |> String.trim,
+  bithumb_api_secret: File.read!("config/secrets/bithumb_api_secret.txt") |> String.trim
 ]
 
 sandbox_config = Keyword.merge(shared_config, [
